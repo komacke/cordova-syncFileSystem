@@ -5,7 +5,7 @@
   found in the LICENSE file.
 -->
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
-    id="org.chromium.syncfilesystem"
+    id="org.chromium.komacke.syncfilesystem"
     version="0.1.6-dev">
   <engines>
     <engine name="cordova" version=">=3.0.0" />
@@ -13,16 +13,16 @@
 
   <name>Chrome Apps SyncFileSystem API</name>
   <keywords>chrome,sync,file,filesystem</keywords>
-  <repo>https://github.com/MobileChromeApps/mobile-chrome-apps.git</repo>
-  <issue>https://github.com/MobileChromeApps/mobile-chrome-apps/issues</issue>
+  <repo>https://github.com/komacke/cordova-syncFileSystem.git</repo>
+  <issue>https://github.com/komacke/cordova-syncFileSystem/issues</issue>
 
   <dependency id="cordova-plugin-chrome-apps-runtime" />
   <dependency id="cordova-plugin-chrome-apps-storage" />
   <dependency id="cordova-plugin-chrome-apps-identity" />
-  <dependency id="org.apache.cordova.file" />
+  <dependency id="cordova-plugin-file" />
 
   <js-module src="syncFileSystem.js" name="SyncFileSystem">
-    <clobbers target="chrome.syncFileSystem" />
+    <clobbers target="org.chromium.syncFileSystem" />
   </js-module>
 
   <platform name="ios">

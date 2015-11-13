@@ -1,3 +1,7 @@
+# org.chromium.komacke.syncfilesystem
+
+Dave picking up from tag 0.5.1 to see if I can make it work for my use case.
+
 # chrome.syncFileSystem Plugin
 
 This plugin allows apps to access a file system that syncs to Google Drive.
