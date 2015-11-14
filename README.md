@@ -1,4 +1,4 @@
-# org.chromium.komacke.syncfilesystem
+# com.komacke.chromium.syncfilesystem
 
 Dave picking up from tag 0.5.1 to see if I can make it work for my use case.
 
