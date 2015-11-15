@@ -26,7 +26,8 @@ public class SyncFileSystem extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
     	super.initialize(cordova, webView);
         String syncableRoot = cordova.getActivity().getFilesDir().getAbsolutePath() + "/syncfs/";
-        new File(syncableRoot).mkdirs();
+        File syncableRootFile = new File(syncableRoot);
+        syncableRootFile.mkdirs();
 
         PluginManager pm = null;
         try {
@@ -40,7 +41,7 @@ public class SyncFileSystem extends CordovaPlugin {
             } catch (Exception e) {}
         }
         FileUtils filePlugin = (FileUtils) pm.getPlugin("File");
-        LocalFilesystem syncFs = new LocalFilesystem("syncable", cordova, syncableRoot);
+        LocalFilesystem syncFs = new LocalFilesystem("syncable", webView.getContext(), webView.getResourceApi(), syncableRootFile);
         filePlugin.registerFilesystem(syncFs);
     }
 

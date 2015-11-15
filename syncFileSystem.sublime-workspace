@@ -296,30 +296,14 @@
 	"buffers":
 	[
 		{
-			"contents": "Local:    master ~\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\nHead:     2031087 Some tweaks to get the plugin to be recognized.\n\n\nNothing to commit (working directory clean)\n\n# Movement:\n#    r = refresh status\n#    1-5 = jump to section\n#    n = next item, N = next section\n#    p = previous item, P = previous section\n#\n# Staging:\n#    s = stage file/section, S = stage all unstaged files\n#    ctrl+shift+s = stage all unstaged and untracked files\n#    u = unstage file/section, U = unstage all files\n#    backspace = discard file/section, shift+backspace = discard everything\n#\n# Commit:\n#    c = commit, C = commit -a (add unstaged)\n#    ctrl+shift+c = commit --amend (amend previous commit)\n#\n# Other:\n#    i = ignore file, I = ignore pattern\n#    enter = open file\n#    d = view diff\n#\n# Stashes:\n#    a = apply stash, A = pop stash\n#    z = create stash, Z = create stash including untracked files\n#    backspace = discard stash",
+			"contents": "Local:    master ~\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\nHead:     1fa5ea1 Move namespace to com.komacke - I don't own org.chromium.\n\n\nNothing to commit (working directory clean)\n\n# Movement:\n#    r = refresh status\n#    1-5 = jump to section\n#    n = next item, N = next section\n#    p = previous item, P = previous section\n#\n# Staging:\n#    s = stage file/section, S = stage all unstaged files\n#    ctrl+shift+s = stage all unstaged and untracked files\n#    u = unstage file/section, U = unstage all files\n#    backspace = discard file/section, shift+backspace = discard everything\n#\n# Commit:\n#    c = commit, C = commit -a (add unstaged)\n#    ctrl+shift+c = commit --amend (amend previous commit)\n#\n# Other:\n#    i = ignore file, I = ignore pattern\n#    enter = open file\n#    d = view diff\n#\n# Stashes:\n#    a = apply stash, A = pop stash\n#    z = create stash, Z = create stash including untracked files\n#    backspace = discard stash",
 			"settings":
 			{
-				"buffer_size": 947,
+				"buffer_size": 957,
 				"line_ending": "Windows",
 				"name": "*git-status*: chrome.syncFileSystem",
 				"read_only": true,
 				"scratch": true
-			}
-		},
-		{
-			"file": "plugin.xml",
-			"settings":
-			{
-				"buffer_size": 2151,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "src/android/SyncFileSystem.java",
-			"settings":
-			{
-				"buffer_size": 2021,
-				"line_ending": "Unix"
 			}
 		}
 	],
@@ -421,6 +405,7 @@
 	[
 		"/C/Users/davek_000/Dropbox/davek/Dev/syncFileSystem/chrome.syncFileSystem/src/android/SyncFileSystem.java",
 		"/C/Users/davek_000/Dropbox/davek/Dev/syncFileSystem/chrome.syncFileSystem/README.md",
+		"/C/Users/davek_000/Dropbox/davek/Dev/syncFileSystem/chrome.syncFileSystem/plugin.xml",
 		"/C/Users/davek_000/Dropbox/davek/Dev/HamLog/js/log-filer.js",
 		"/C/Users/davek_000/Dropbox/davek/Dev/HamLog/js/entry.js",
 		"/C/Users/davek_000/Dropbox/davek/Dev/HamLog/js/log-table.js",
@@ -467,6 +452,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"chromium",
 			"fs-syncable",
 			"isSyncable",
 			"DELAY",
@@ -593,8 +579,7 @@
 			"buildRow",
 			"Filer",
 			"vintage",
-			"logEntri",
-			"_rng"
+			"logEntri"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -616,7 +601,7 @@
 	"groups":
 	[
 		{
-			"selected": 2,
+			"selected": 0,
 			"sheets":
 			[
 				{
@@ -624,15 +609,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 947,
+						"buffer_size": 957,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								142,
-								142
+								152,
+								152
 							]
 						],
 						"settings":
@@ -641,16 +626,16 @@
 							"__vi_external_disable": true,
 							"bh_regions":
 							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
 								"bh_curly",
 								"bh_curly_center",
 								"bh_curly_open",
@@ -661,41 +646,41 @@
 								"bh_default_open",
 								"bh_default_close",
 								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
 								"bh_square_close",
 								"bh_square_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content"
 							],
 							"default_dir": "C:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem",
 							"draw_white_space": "none",
@@ -708,184 +693,6 @@
 						},
 						"translation.x": 0.0,
 						"translation.y": 0.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 1,
-					"file": "plugin.xml",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 2151,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1592,
-								1592
-							]
-						],
-						"settings":
-						{
-							"BracketHighlighterBusy": false,
-							"bh_regions":
-							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
-							],
-							"syntax": "Packages/XML/XML.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 130.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 1,
-					"type": "text"
-				},
-				{
-					"buffer": 2,
-					"file": "src/android/SyncFileSystem.java",
-					"semi_transient": true,
-					"settings":
-					{
-						"buffer_size": 2021,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1546,
-								1546
-							]
-						],
-						"settings":
-						{
-							"BracketHighlighterBusy": false,
-							"bh_regions":
-							[
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
-								"bh_single_quote",
-								"bh_single_quote_center",
-								"bh_single_quote_open",
-								"bh_single_quote_close",
-								"bh_single_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_double_quote",
-								"bh_double_quote_center",
-								"bh_double_quote_open",
-								"bh_double_quote_close",
-								"bh_double_quote_content"
-							],
-							"syntax": "Packages/Java/Java.tmLanguage",
-							"tab_size": 4,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": -0.0,
-						"translation.y": 61.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 0,
