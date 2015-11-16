@@ -22,7 +22,7 @@
   <dependency id="cordova-plugin-file" />
 
   <js-module src="syncFileSystem.js" name="SyncFileSystem">
-    <clobbers target="org.chromium.syncFileSystem" />
+    <clobbers target="komacke.chromium.syncFileSystem" />
   </js-module>
 
   <platform name="ios">
