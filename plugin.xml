@@ -41,7 +41,7 @@
   </platform>
 
   <platform name="android">
-    <source-file src="src/android/SyncFileSystem.java" target-dir="src/com/komacke" />
+    <source-file src="src/android/SyncFileSystem.java" target-dir="src/com/komacke/chromium" />
     <config-file target="res/xml/config.xml" parent="/widget">
       <feature name="SyncFileSystem">
         <param name="android-package" value="com.komacke.chromium.SyncFileSystem"/>
