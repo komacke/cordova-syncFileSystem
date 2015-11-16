@@ -22,7 +22,8 @@
   <dependency id="cordova-plugin-file" />
 
   <js-module src="syncFileSystem.js" name="SyncFileSystem">
-    <clobbers target="komacke.chromium.syncFileSystem" />
+    <!-- should this be com.komacke.chromium? right now want compatible with chrome apps -->
+    <clobbers target="chrome.syncFileSystem" />
   </js-module>
 
   <platform name="ios">
