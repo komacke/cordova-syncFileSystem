@@ -606,14 +606,16 @@ function saveData(fileName, data, callback) {
         fileEntry.createWriter(onCreateWriterSuccess, onCreateWriterError);
     };
     var onGetFileError = function(e) {
-        console.log('Failed to get file.');
+        console.log('Failed to get file: ' + fileName);
+        console.log(encodeURI(fileName));
         console.log(e);
     };
-    console.log(fileName);
 
     var getFileFlags = { create: true, exclusive: false };
     //localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+    console.log(encodeURI(fileName));
+    console.log(fileName);
+    DirectoryEntry.prototype.getFile.call(localDirectoryEntry, encodeURI(fileName), getFileFlags, onGetFileSuccess, onGetFileError);
 }
 
 //----------------------------
