@@ -609,6 +609,7 @@ function saveData(fileName, data, callback) {
         console.log('Failed to get file.');
         console.log(e);
     };
+    console.log(fileName);
 
     var getFileFlags = { create: true, exclusive: false };
     //localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);

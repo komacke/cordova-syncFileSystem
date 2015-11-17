@@ -296,12 +296,23 @@
 	"buffers":
 	[
 		{
-			"contents": "Remote:   . @ \nLocal:    master ~\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\nHead:     63f9643 Fix clobbers which is setting the namespace in js.\n\n\nNothing to commit (working directory clean)\n\n# Movement:\n#    r = refresh status\n#    1-5 = jump to section\n#    n = next item, N = next section\n#    p = previous item, P = previous section\n#\n# Staging:\n#    s = stage file/section, S = stage all unstaged files\n#    ctrl+shift+s = stage all unstaged and untracked files\n#    u = unstage file/section, U = unstage all files\n#    backspace = discard file/section, shift+backspace = discard everything\n#\n# Commit:\n#    c = commit, C = commit -a (add unstaged)\n#    ctrl+shift+c = commit --amend (amend previous commit)\n#\n# Other:\n#    i = ignore file, I = ignore pattern\n#    enter = open file\n#    d = view diff\n#\n# Stashes:\n#    a = apply stash, A = pop stash\n#    z = create stash, Z = create stash including untracked files\n#    backspace = discard stash",
+			"contents": "Remote:   . @ \nLocal:    master ~\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\nHead:     19c632c Add debug message.\n\n\nChanges:\n	Modified   syncFileSystem.js\n\n\n# Movement:\n#    r = refresh status\n#    1-5 = jump to section\n#    n = next item, N = next section\n#    p = previous item, P = previous section\n#\n# Staging:\n#    s = stage file/section, S = stage all unstaged files\n#    ctrl+shift+s = stage all unstaged and untracked files\n#    u = unstage file/section, U = unstage all files\n#    backspace = discard file/section, shift+backspace = discard everything\n#\n# Commit:\n#    c = commit, C = commit -a (add unstaged)\n#    ctrl+shift+c = commit --amend (amend previous commit)\n#\n# Other:\n#    i = ignore file, I = ignore pattern\n#    enter = open file\n#    d = view diff\n#\n# Stashes:\n#    a = apply stash, A = pop stash\n#    z = create stash, Z = create stash including untracked files\n#    backspace = discard stash",
 			"settings":
 			{
-				"buffer_size": 965,
+				"buffer_size": 929,
 				"line_ending": "Windows",
 				"name": "*git-status*: chrome.syncFileSystem",
+				"read_only": true,
+				"scratch": true
+			}
+		},
+		{
+			"contents": "diff --git a/syncFileSystem.js b/syncFileSystem.js\nindex a256fad..ba98c81 100644\n--- a/syncFileSystem.js\n+++ b/syncFileSystem.js\n@@ -609,6 +609,7 @@ function saveData(fileName, data, callback) {\n         console.log('Failed to get file.');\n         console.log(e);\n     };\n+    console.log(fileName);\n \n     var getFileFlags = { create: true, exclusive: false };\n     //localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);\n",
+			"settings":
+			{
+				"buffer_size": 457,
+				"line_ending": "Windows",
+				"name": "*git-diff*: syncFileSystem.js",
 				"read_only": true,
 				"scratch": true
 			}
@@ -310,15 +321,15 @@
 			"file": "plugin.xml",
 			"settings":
 			{
-				"buffer_size": 2171,
+				"buffer_size": 2254,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"contents": "Searching 8 files for \"runtime\"\n\nC:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\\plugin.xml:\n   17    <issue>https://github.com/komacke/cordova-syncFileSystem/issues</issue>\n   18  \n   19:   <dependency id=\"cordova-plugin-chrome-apps-runtime\" />\n   20    <dependency id=\"cordova-plugin-chrome-apps-storage\" />\n   21    <dependency id=\"cordova-plugin-chrome-apps-identity\" />\n\nC:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\\syncFileSystem.js:\n    3  // found in the LICENSE file.\n    4  \n    5: var runtime = require('org.chromium.runtime.runtime');\n    6  var exec = cordova.require('cordova/exec');\n    7  \n    .\n  217      var onGetSyncableRootDirectoryIdSuccess = function(syncableRootDirectoryId) {\n  218          // Get the app directory id.\n  219:         getDirectoryId(runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);\n  220      };\n  221      var onGetTokenStringSuccess = function() {\n  ...\n  233          // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.\n  234          var pathRemainder = entry.fullPath;\n  235:         var appIdIndex = pathRemainder.indexOf(runtime.id);\n  236  \n  237          // If the app id isn't in the path, we can't sync it.\n  ...\n  256  \n  257          // Using the remainder of the path, start the recursive process of drilling down.\n  258:         pathRemainder = pathRemainder.substring(appIdIndex + runtime.id.length + 1);\n  259          syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);\n  260      };\n  ...\n  384      var onGetTokenStringSuccess = function() {\n  385          // Get the file id and pass it on.\n  386:         var appIdIndex = entry.fullPath.indexOf(runtime.id);\n  387  \n  388          // If the app id isn't in the path, we can't remove it.\n  ...\n  392          }\n  393  \n  394:         var relativePath = entry.fullPath.substring(appIdIndex + runtime.id.length + 1);\n  395          if (entry.isFile) {\n  396              getFileId(relativePath, _syncableAppDirectoryId, onGetIdSuccess);\n  ...\n  443  // errorCallback: function()\n  444  function getDriveChanges(successCallback, errorCallback) {\n  445:     var NEXT_CHANGE_ID_KEY = SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-next_change_id';\n  446      var onGetTokenStringSuccess = function() {\n  447          // Send a request to retrieve the changes.\n  ...\n  758  // This function returns a key to use for file id caching.\n  759  function constructFileIdKey(entryName) {\n  760:     return SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-' + entryName;\n  761  }\n  762  \n  763  // This function returns the file name associated with the given cached file id key.\n  764  function extractFileName(key) {\n  765:     return key.substring(key.indexOf(runtime.id) + runtime.id.length + 1);\n  766  }\n  767  \n  ...\n  805              }\n  806          } else {\n  807:             chrome.runtime.lastError = { message: \"Sync: authentication failed.\" };\n  808              if (typeof errorCallback === 'function') {\n  809                  errorCallback();\n  ...\n  818  \n  819  exports.requestFileSystem = function(callback) {\n  820:     var manifest = runtime.getManifest();\n  821      if (!manifest) {\n  822          throw new Error(\"Manifest does not exist and was not set.\");\n  ...\n  886          var onGetDirectoryFailure = function(e) {\n  887              console.log('Failed to get directory.');\n  888:             chrome.runtime.lastError = { message: \"Sync: Failed to get local filesystem for app\" };\n  889              if (typeof callback === 'function') {\n  890                  callback();\n  ...\n  893  \n  894          // TODO(maxw): Make the directory name app-specific.\n  895:         fileSystem.root.getDirectory(runtime.id, getDirectoryFlags, onGetDirectorySuccess, onGetDirectoryFailure);\n  896      };\n  897      var onRequestFileSystemFailure = function(e) {\n  898          console.log(\"Failed to get file system.\");\n  899:         chrome.runtime.lastError = { message: \"Sync: Failed to get local filesystem\" };\n  900          if (typeof callback === 'function') {\n  901              callback();\n  ...\n  974        // Reset the \"next change\" counter\n  975        reset = {};\n  976:       reset[SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-next_change_id'] = 1;\n  977        chrome.storage.internal.set(reset, function() {\n  978          // Restart the sync process\n\n19 matches across 2 files\n",
+			"contents": "Searching 9 files for \"failed to get file\" (case sensitive)\n\n0 matches\n\nSearching 9 files for \"failed to get file\"\n\nC:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem\\syncFileSystem.js:\n  563      };\n  564      var onGetFileError = function(e) {\n  565:         console.log('Failed to get file.');\n  566      };\n  567  \n  ...\n  607      };\n  608      var onGetFileError = function(e) {\n  609:         console.log('Failed to get file.');\n  610      };\n  611  \n  ...\n  896      };\n  897      var onRequestFileSystemFailure = function(e) {\n  898:         console.log(\"Failed to get file system.\");\n  899          chrome.runtime.lastError = { message: \"Sync: Failed to get local filesystem\" };\n  900          if (typeof callback === 'function') {\n\n3 matches in 1 file\n",
 			"settings":
 			{
-				"buffer_size": 4568,
+				"buffer_size": 786,
 				"line_ending": "Windows",
 				"name": "Find Results",
 				"scratch": true
@@ -336,7 +347,7 @@
 			"file": "syncFileSystem.js",
 			"settings":
 			{
-				"buffer_size": 42667,
+				"buffer_size": 42805,
 				"line_ending": "Unix"
 			}
 		}
@@ -480,7 +491,7 @@
 	],
 	"find":
 	{
-		"height": 43.0
+		"height": 34.0
 	},
 	"find_in_files":
 	{
@@ -495,6 +506,32 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"failed to get file",
+			"localDirectoryEntry",
+			"application/vnd",
+			"sync",
+			"enableSyncabilityForEntry",
+			"enableSyncabilityForDirectoryEntry",
+			"createAppDirectoryOnDrive",
+			"onGetSyncableAppDirectoryIdSuccess",
+			"getDirectoryId",
+			"successCallback",
+			"Drive file id for directory",
+			"downloadFile",
+			"syncable",
+			"onCreateAppDirectoryOnDriveSuccess",
+			"syncfs",
+			"getServiceStatus",
+			"savedata",
+			"localDirectoryEntry",
+			"root",
+			"local_to",
+			"remote_to",
+			"trashed",
+			"syncfs",
+			"fileIdKey",
+			"get",
+			"Service",
 			"window",
 			"runtime",
 			"getRootURL",
@@ -596,33 +633,7 @@
 			"buildRow",
 			"index",
 			"logEntries",
-			"addentry",
-			"processAll",
-			"resetoriginal",
-			"originalRecords",
-			"orignalRecord",
-			"new logentries",
-			"dynatable",
-			"setentry",
-			"json.",
-			"json",
-			"editor",
-			"uuid",
-			"buildRow",
-			"origi",
-			"dyna",
-			"niceNames",
-			"nicenames",
-			"buildrow",
-			"Entry",
-			"niceNames",
-			"Orig",
-			"load",
-			"logEntries",
-			"console",
-			"pushS",
-			"skipPush",
-			"pushStat"
+			"addentry"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -644,7 +655,7 @@
 	"groups":
 	[
 		{
-			"selected": 1,
+			"selected": 5,
 			"sheets":
 			[
 				{
@@ -652,15 +663,15 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 965,
+						"buffer_size": 929,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								160,
-								160
+								137,
+								137
 							]
 						],
 						"settings":
@@ -674,46 +685,31 @@
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
@@ -723,7 +719,22 @@
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_single_quote_content"
+								"bh_single_quote_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"default_dir": "C:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem",
 							"draw_white_space": "none",
@@ -738,24 +749,23 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 2,
 					"type": "text"
 				},
 				{
 					"buffer": 1,
-					"file": "plugin.xml",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2171,
+						"buffer_size": 457,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								962,
-								962
+								129,
+								129
 							]
 						],
 						"settings":
@@ -763,21 +773,26 @@
 							"BracketHighlighterBusy": false,
 							"bh_regions":
 							[
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
 								"bh_double_quote",
 								"bh_double_quote_center",
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -788,54 +803,143 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
+								"bh_single_quote",
+								"bh_single_quote_center",
+								"bh_single_quote_open",
+								"bh_single_quote_close",
+								"bh_single_quote_content",
 								"bh_tag",
 								"bh_tag_center",
 								"bh_tag_open",
 								"bh_tag_close",
 								"bh_tag_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
+							],
+							"default_dir": "C:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem",
+							"git_diff_cached": false,
+							"git_diff_clean": false,
+							"git_diff_path": "syncFileSystem.js",
+							"git_diff_unified": 3,
+							"git_repo": "C:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem",
+							"git_view": "diff",
+							"syntax": "Packages/SublimeGit/syntax/SublimeGit Diff.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "plugin.xml",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2254,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1025,
+								1025
+							]
+						],
+						"settings":
+						{
+							"BracketHighlighterBusy": false,
+							"bh_regions":
+							[
+								"bh_double_quote",
+								"bh_double_quote_center",
+								"bh_double_quote_open",
+								"bh_double_quote_close",
+								"bh_double_quote_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_single_quote_content"
+								"bh_single_quote_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"syntax": "Packages/XML/XML.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 270.0,
+						"translation.y": 102.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
+					"buffer": 3,
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 4568,
+						"buffer_size": 786,
 						"regions":
 						{
 							"match":
@@ -844,80 +948,16 @@
 								"regions":
 								[
 									[
-										260,
-										267
+										297,
+										315
 									],
 									[
-										551,
-										558
+										436,
+										454
 									],
 									[
-										583,
-										590
-									],
-									[
-										591,
-										598
-									],
-									[
-										830,
-										837
-									],
-									[
-										1290,
-										1297
-									],
-									[
-										1559,
-										1566
-									],
-									[
-										1855,
-										1862
-									],
-									[
-										2050,
-										2057
-									],
-									[
-										2370,
-										2377
-									],
-									[
-										2684,
-										2691
-									],
-									[
-										2906,
-										2913
-									],
-									[
-										2920,
-										2927
-									],
-									[
-										3038,
-										3045
-									],
-									[
-										3301,
-										3308
-									],
-									[
-										3577,
-										3584
-									],
-									[
-										3876,
-										3883
-									],
-									[
-										4106,
-										4113
-									],
-									[
-										4400,
-										4407
+										587,
+										605
 									]
 								],
 								"scope": ""
@@ -926,8 +966,8 @@
 						"selection":
 						[
 							[
-								458,
-								458
+								440,
+								440
 							]
 						],
 						"settings":
@@ -940,16 +980,21 @@
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -960,31 +1005,26 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
@@ -994,7 +1034,7 @@
 							"default_dir": "C:\\Users\\davek_000\\Dropbox\\davek\\Dev\\syncFileSystem\\chrome.syncFileSystem",
 							"detect_indentation": false,
 							"line_numbers": false,
-							"output_tag": 1,
+							"output_tag": 2,
 							"result_base_dir": "",
 							"result_file_regex": "^([A-Za-z\\\\/<].*):$",
 							"result_line_regex": "^ +([0-9]+):",
@@ -1002,14 +1042,14 @@
 							"syntax": "Packages/Default/Find Results.hidden-tmLanguage"
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 39.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 3,
+					"buffer": 4,
 					"file": "src/android/SyncFileSystem.java",
 					"semi_transient": false,
 					"settings":
@@ -1021,8 +1061,8 @@
 						"selection":
 						[
 							[
-								191,
-								191
+								888,
+								888
 							]
 						],
 						"settings":
@@ -1035,16 +1075,21 @@
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
-								"bh_regex",
-								"bh_regex_center",
-								"bh_regex_open",
-								"bh_regex_close",
-								"bh_regex_content",
+								"bh_unmatched",
+								"bh_unmatched_center",
+								"bh_unmatched_open",
+								"bh_unmatched_close",
+								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
+								"bh_round",
+								"bh_round_center",
+								"bh_round_open",
+								"bh_round_close",
+								"bh_round_content",
 								"bh_c_define",
 								"bh_c_define_center",
 								"bh_c_define_open",
@@ -1055,31 +1100,26 @@
 								"bh_curly_open",
 								"bh_curly_close",
 								"bh_curly_content",
+								"bh_regex",
+								"bh_regex_center",
+								"bh_regex_open",
+								"bh_regex_close",
+								"bh_regex_content",
 								"bh_single_quote",
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
 								"bh_single_quote_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
 								"bh_angle",
 								"bh_angle_center",
 								"bh_angle_open",
 								"bh_angle_close",
 								"bh_angle_content",
-								"bh_round",
-								"bh_round_center",
-								"bh_round_open",
-								"bh_round_close",
-								"bh_round_content",
-								"bh_unmatched",
-								"bh_unmatched_center",
-								"bh_unmatched_open",
-								"bh_unmatched_close",
-								"bh_unmatched_content",
 								"bh_square",
 								"bh_square_center",
 								"bh_square_open",
@@ -1091,27 +1131,27 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 0.0,
+						"translation.y": 245.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 4,
+					"buffer": 5,
 					"file": "syncFileSystem.js",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 42667,
+						"buffer_size": 42805,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								42463,
-								42469
+								26820,
+								26820
 							]
 						],
 						"settings":
@@ -1124,46 +1164,31 @@
 								"bh_double_quote_open",
 								"bh_double_quote_close",
 								"bh_double_quote_content",
-								"bh_square",
-								"bh_square_center",
-								"bh_square_open",
-								"bh_square_close",
-								"bh_square_content",
-								"bh_default",
-								"bh_default_center",
-								"bh_default_open",
-								"bh_default_close",
-								"bh_default_content",
-								"bh_curly",
-								"bh_curly_center",
-								"bh_curly_open",
-								"bh_curly_close",
-								"bh_curly_content",
-								"bh_c_define",
-								"bh_c_define_center",
-								"bh_c_define_open",
-								"bh_c_define_close",
-								"bh_c_define_content",
-								"bh_angle",
-								"bh_angle_center",
-								"bh_angle_open",
-								"bh_angle_close",
-								"bh_angle_content",
-								"bh_tag",
-								"bh_tag_center",
-								"bh_tag_open",
-								"bh_tag_close",
-								"bh_tag_content",
 								"bh_unmatched",
 								"bh_unmatched_center",
 								"bh_unmatched_open",
 								"bh_unmatched_close",
 								"bh_unmatched_content",
+								"bh_default",
+								"bh_default_center",
+								"bh_default_open",
+								"bh_default_close",
+								"bh_default_content",
 								"bh_round",
 								"bh_round_center",
 								"bh_round_open",
 								"bh_round_close",
 								"bh_round_content",
+								"bh_c_define",
+								"bh_c_define_center",
+								"bh_c_define_open",
+								"bh_c_define_close",
+								"bh_c_define_content",
+								"bh_curly",
+								"bh_curly_center",
+								"bh_curly_open",
+								"bh_curly_close",
+								"bh_curly_content",
 								"bh_regex",
 								"bh_regex_center",
 								"bh_regex_open",
@@ -1173,17 +1198,32 @@
 								"bh_single_quote_center",
 								"bh_single_quote_open",
 								"bh_single_quote_close",
-								"bh_single_quote_content"
+								"bh_single_quote_content",
+								"bh_tag",
+								"bh_tag_center",
+								"bh_tag_open",
+								"bh_tag_close",
+								"bh_tag_content",
+								"bh_angle",
+								"bh_angle_center",
+								"bh_angle_open",
+								"bh_angle_close",
+								"bh_angle_content",
+								"bh_square",
+								"bh_square_center",
+								"bh_square_open",
+								"bh_square_close",
+								"bh_square_content"
 							],
 							"syntax": "Packages/JavaScript/JavaScript.tmLanguage",
 							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 17124.0,
+						"translation.y": 7633.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1191,7 +1231,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 34.0
+		"height": 21.0
 	},
 	"input":
 	{
@@ -1248,7 +1288,7 @@
 	"project": "syncFileSystem.sublime-project",
 	"replace":
 	{
-		"height": 62.0
+		"height": 38.0
 	},
 	"save_all_on_build": true,
 	"select_file":
