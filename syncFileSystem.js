@@ -607,6 +607,7 @@ function saveData(fileName, data, callback) {
     };
     var onGetFileError = function(e) {
         console.log('Failed to get file.');
+        console.log(e);
     };
 
     var getFileFlags = { create: true, exclusive: false };
