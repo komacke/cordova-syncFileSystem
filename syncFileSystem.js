@@ -933,6 +933,10 @@ exports.getFileStatuses = function(fileEntries, callback) {
     // TODO(maxw): Implement this!
 };
 
+exports.getServiceStatus = function(callback) {
+    // TODO(maxw): Implement this!
+};
+
 exports.onServiceStatusChanged = { };
 exports.onServiceStatusChanged.addListener = function(listener) {
     // TODO(maxw): Implement this!
