@@ -156,7 +156,7 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
         };
 
         // Call the original function.  The augmented success callback will take care of the syncability addition work.
-        DirectoryEntry.prototype.getFile.call(directoryEntry, path, options, augmentedSuccessCallback, errorCallback);
+        DirectoryEntry.prototype.getFile.call(directoryEntry, encodeURIComponent(path), options, augmentedSuccessCallback, errorCallback);
     };
 }
 
@@ -566,8 +566,8 @@ function deleteFile(fileName, callback) {
     };
 
     var getFileFlags = { create: true, exclusive: false };
-    //localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+    localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+    //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileName, getFileFlags, onGetFileSuccess, onGetFileError);
 }
 
 // This function downloads the given Drive file.
@@ -607,8 +607,6 @@ function saveData(fileName, data, callback) {
     };
     var onGetFileError = function(e) {
         console.log('Failed to get file: ' + fileName);
-        console.log(encodeURI(fileName));
-        console.log(e);
         var msg = '';
         switch ( e.code ) {
             case FileError.ENCODING_ERR:
@@ -649,10 +647,7 @@ function saveData(fileName, data, callback) {
     };
 
     var getFileFlags = { create: true, exclusive: false };
-    //localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    console.log(encodeURIComponent(fileName));
-    console.log(fileName);
-    DirectoryEntry.prototype.getFile.call(localDirectoryEntry, encodeURIComponent(fileName), getFileFlags, onGetFileSuccess, onGetFileError);
+    localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
 }
 
 //----------------------------
