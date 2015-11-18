@@ -1031,7 +1031,7 @@ exports.onServiceStatusChanged = { };
 exports.onServiceStatusChanged.addListener = function(listener) {
     if (typeof(listener) == 'function') {
         extendedListener = function(callback) {
-            this.getServiceStatus(listener);
+            exports.getServiceStatus(listener);
         };
         document.addEventListener('offline', extendedListener, false);
         document.addEventListener('online', extendedListener, false);
