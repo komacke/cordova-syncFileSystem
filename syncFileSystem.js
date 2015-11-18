@@ -959,23 +959,28 @@ exports.getConflictResolutionPolicy = function(callback) {
 
 exports.getUsageAndQuota = function(fileSystem, callback) {
     // TODO(maxw): Implement this!
+    console.log('getUsageAndQuota');
 };
 
 exports.getFileStatus = function(fileEntry, callback) {
     // TODO(maxw): Implement this!
+    console.log('getFileStatus');
 };
 
 exports.getFileStatuses = function(fileEntries, callback) {
     // TODO(maxw): Implement this!
+    console.log('getFileStatuses');
 };
 
 exports.getServiceStatus = function(callback) {
     // TODO(maxw): Implement this!
+    console.log('getServiceStatus');
 };
 
 exports.onServiceStatusChanged = { };
 exports.onServiceStatusChanged.addListener = function(listener) {
     // TODO(maxw): Implement this!
+    console.log('onServiceStatusChanged');
 };
 
 exports.onFileStatusChanged = { };
