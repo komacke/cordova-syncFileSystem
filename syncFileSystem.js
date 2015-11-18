@@ -973,14 +973,62 @@ exports.getFileStatuses = function(fileEntries, callback) {
 };
 
 exports.getServiceStatus = function(callback) {
-    // TODO(maxw): Implement this!
-    console.log('getServiceStatus');
+    var detail = {};
+
+    switch (navigator.connection.type) {
+        case Connection.UNKNOWN:
+            detail.state = 'temporary_unavailable';
+            detail.description = 'Unknown connection';
+            break;
+        case Connection.ETHERNET:
+            detail.state = 'running';
+            detail.description = 'Ethernet connection';
+            break;
+        case Connection.WIFI:
+            detail.state = 'running';
+            detail.description = 'WiFi connection';
+            break;
+        case Connection.CELL_2G:
+            detail.state = 'running';
+            detail.description = 'Cell 2G connection';
+            break;
+        case Connection.CELL_3G:
+            detail.state = 'running';
+            detail.description = 'Cell 3G connection';
+            break;
+        case Connection.CELL_4G:
+            detail.state = 'running';
+            detail.description = 'Cell 4G connection';
+            break;
+        case Connection.CELL:
+            detail.state = 'running';
+            detail.description = 'Cell generic connection';
+            break;
+        case Connection.NONE:
+            detail.state = 'temporary_unavailable';
+            detail.description = 'No network connection';
+            break;
+        default:
+            detail.state = 'temporary_unavailable';
+            detail.description = 'Undefined connection state';
+            break;
+    }
+
+    console.log(detail);
+    callback(detail);
 };
 
 exports.onServiceStatusChanged = { };
 exports.onServiceStatusChanged.addListener = function(listener) {
-    // TODO(maxw): Implement this!
-    console.log('onServiceStatusChanged');
+    if (typeof(listener) == 'function') {
+        extendedListener = function(callback) {
+            this.getServiceStatus(listener);
+        };
+        document.addEventListner('offline', extendedListener, false);
+        document.addEventListner('online', extendedListener, false);
+    } else {
+        console.log('onServiceStatusChanged: Attempted to add a non-function listener.');
+    }
 };
 
 exports.onFileStatusChanged = { };
@@ -988,7 +1036,7 @@ exports.onFileStatusChanged.addListener = function(listener) {
     if (typeof(listener) == 'function') {
         fileStatusListeners.push(listener);
     } else {
-        console.log('Attempted to add a non-function listener.');
+        console.log('onFileStatusChanged: Attempted to add a non-function listener.');
     }
 };
 
