@@ -343,7 +343,7 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                     xhr.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
                 }
                 xhr.setRequestHeader('Content-Type', 'multipart/related; boundary=' + boundary);
-                xhr.setRequestHeader('Content-Length', bodyString.length);
+                //xhr.setRequestHeader('Content-Length', bodyString.length);
                 xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
                 xhr.send(bodyString);
             };
