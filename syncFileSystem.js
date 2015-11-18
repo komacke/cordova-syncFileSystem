@@ -974,6 +974,14 @@ exports.getFileStatuses = function(fileEntries, callback) {
 
 exports.getServiceStatus = function(callback) {
     var detail = {};
+    /*
+        from chrome's syncFileSystem:
+            "initializing"
+            "running"
+            "authentication_required"
+            "temporary_unavailable"
+            "disabled"
+     */
 
     switch (navigator.connection.type) {
         case Connection.UNKNOWN:
