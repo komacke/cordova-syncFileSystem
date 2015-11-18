@@ -1032,8 +1032,8 @@ exports.onServiceStatusChanged.addListener = function(listener) {
         extendedListener = function(callback) {
             this.getServiceStatus(listener);
         };
-        document.addEventListner('offline', extendedListener, false);
-        document.addEventListner('online', extendedListener, false);
+        document.addEventListener('offline', extendedListener, false);
+        document.addEventListener('online', extendedListener, false);
     } else {
         console.log('onServiceStatusChanged: Attempted to add a non-function listener.');
     }
