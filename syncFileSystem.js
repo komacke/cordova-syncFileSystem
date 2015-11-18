@@ -966,6 +966,9 @@ exports.getUsageAndQuota = function(fileSystem, callback) {
 exports.getFileStatus = function(fileEntry, callback) {
     // TODO(maxw): Implement this!
     console.log('getFileStatus');
+    if (callback) {
+        callback(fileEntry, FILE_STATUS_SYNCED);
+    }
 };
 
 exports.getFileStatuses = function(fileEntries, callback) {
