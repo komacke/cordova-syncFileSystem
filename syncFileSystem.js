@@ -148,7 +148,7 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
                     }
                 };
                 // breaks sync loop; but why was it here?
-                sync(fileEntry, onSyncSuccess);
+                //sync(fileEntry, onSyncSuccess);
             } else {
                 if (typeof successCallback === 'function') {
                     successCallback(fileEntry);
