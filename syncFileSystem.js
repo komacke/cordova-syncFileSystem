@@ -148,7 +148,7 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
                     }
                 };
                 // breaks sync loop; but why was it here?
-                //sync(fileEntry, onSyncSuccess);
+                sync(fileEntry, onSyncSuccess);
             } else {
                 if (typeof successCallback === 'function') {
                     successCallback(fileEntry);
@@ -157,7 +157,7 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
         };
 
         // Call the original function.  The augmented success callback will take care of the syncability addition work.
-        DirectoryEntry.prototype.getFile.call(directoryEntry, encodeURIComponent(path), options, augmentedSuccessCallback, errorCallback);
+        DirectoryEntry.prototype.getFile.call(directoryEntry, path, options, augmentedSuccessCallback, errorCallback);
     };
 }
 
