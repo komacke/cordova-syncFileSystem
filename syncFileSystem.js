@@ -582,7 +582,7 @@ function downloadFile(file, callback) {
                     console.log('Download of ' + file.title + ' complete!');
                     callback(fileEntry);
                 }
-                saveData(file.name, xhr.responseText, onSaveDataSuccess);
+                saveData(file.title, xhr.responseText, onSaveDataSuccess);
             } else {
                 console.log('Download failed with status ' + xhr.status + '.');
             }
