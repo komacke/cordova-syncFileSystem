@@ -272,11 +272,11 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
     if (slashIndex < 0) {
         // We're done diving and can sync the entry.
         if (entry.isFile) {
-            onGetFileIdSuccess = function(fileId) {
-                if (fileId != null FILE_STATUS_SYNCED)
+            var onGetFileIdSuccess = function(fileId) {
+                if (fileId != FILE_STATUS_SYNCED)
                     uploadFile(entry, currentDirectoryId /* parentDirectoryId */, callback);
             }
-            getFileId(entry.name, _syncableAppDirectoryId, onGetFileIdSuccess);
+            getFileId(entry.name, currentDirectoryId, onGetFileIdSuccess);
         } else if (entry.isDirectory) {
             nextDirectoryName = pathRemainder;
             onGetDirectoryIdSuccess = function(directoryId) {
