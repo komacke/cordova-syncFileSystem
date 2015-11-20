@@ -272,7 +272,11 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
     if (slashIndex < 0) {
         // We're done diving and can sync the entry.
         if (entry.isFile) {
-            uploadFile(entry, currentDirectoryId /* parentDirectoryId */, callback);
+            onGetFileIdSuccess = function(fileId) {
+                if (fileId != null FILE_STATUS_SYNCED)
+                    uploadFile(entry, currentDirectoryId /* parentDirectoryId */, callback);
+            }
+            getFileId(entry.name, _syncableAppDirectoryId, onGetFileIdSuccess);
         } else if (entry.isDirectory) {
             nextDirectoryName = pathRemainder;
             onGetDirectoryIdSuccess = function(directoryId) {
@@ -991,7 +995,7 @@ exports.getFileStatus = function(fileEntry, callback) {
 exports.getFileStatuses = function(fileEntries, callback) {
     // TODO(maxw): Implement this!
     console.log('getFileStatuses');
-    
+
     var statuses = [];
     for (var entry in fileEntries) {
         statues.push({Entry: entry, FileStatus: null});
