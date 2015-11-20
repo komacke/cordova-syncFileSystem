@@ -41,6 +41,7 @@ var SYNC_ACTION_UPDATED = 'updated';
 var FILE_STATUS_CONFLICTING = 'conflicting';
 var FILE_STATUS_PENDING = 'pending';
 var FILE_STATUS_SYNCED = 'synced';
+var FILE_STATUS_NA = null;
 
 var SYNC_DIRECTION_LOCAL_TO_REMOTE = 'local_to_remote';
 var SYNC_DIRECTION_REMOTE_TO_LOCAL = 'remote_to_local';
@@ -147,8 +148,7 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
                         successCallback(fileEntry);
                     }
                 };
-                // breaks sync loop; but why was it here?
-                //sync(fileEntry, onSyncSuccess);
+                sync(fileEntry, onSyncSuccess);
             } else {
                 if (typeof successCallback === 'function') {
                     successCallback(fileEntry);
@@ -501,7 +501,7 @@ function getDriveChanges(successCallback, errorCallback) {
                                         for (var i = 0; i < fileStatusListeners.length; i++) {
                                             fileStatusListeners[i](fileInfo);
                                         }
-                                        cacheDriveId(fileEntry.name, change.fileId, null);
+                                        cacheDriveId(fileEntry.name, change.fileId, FILE_STATUS_SYNCED, null);
                                     };
                                     downloadFile(changedFile, onDownloadFileSuccess);
                                 }
@@ -703,8 +703,8 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
     var getCallback = function(items) {
         if (items[fileIdKey]) {
             // If the file id has been cached, use it.
-            console.log('Drive file id for directory ' + directoryName + ' retrieved from cache.');
-            successCallback(items[fileIdKey]);
+            console.log('Drive file id ' + items[fileIdKey].driveId + ' for directory ' + directoryName + ' retrieved from cache.');
+            successCallback(items[fileIdKey].driveId);
         } else {
             // If the file id has not been cached, query for it, cache it, and pass it on.
             var query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + directoryName + '" and trashed = false';
@@ -717,7 +717,7 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
                 var onCacheDriveIdSuccess = function() {
                     successCallback(fileId);
                 };
-                cacheDriveId(directoryName, fileId, onCacheDriveIdSuccess);
+                cacheDriveId(directoryName, fileId, FILE_STATUS_NA, onCacheDriveIdSuccess);
             };
 
             // Create the error callback based on whether we should create a directory if it doesn't exist.
@@ -750,8 +750,8 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
     var getCallback = function(items) {
         if (items[fileIdKey]) {
             // If the file id has been cached, use it.
-            console.log('Drive file id for file ' + fileName + ' retrieved from cache.');
-            successCallback(items[fileIdKey]);
+            console.log('Drive file id ' + items[fileIdKey].driveId + ' for file ' + fileName + ' retrieved from cache.');
+            successCallback(items[fileIdKey].driveId);
         } else {
             // If the file id has not been cached, query for it, cache it, and pass it on.
             // In order to support paths, we need to call this function recursively.
@@ -763,7 +763,7 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
                     var onCacheDriveIdSuccess = function() {
                         successCallback(fileId);
                     };
-                    cacheDriveId(fileName, fileId, onCacheDriveIdSuccess);
+                    cacheDriveId(fileName, fileId, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 };
                 var errorCallback = function(e) {
                     if (e === FILE_NOT_FOUND_ERROR) {
@@ -792,6 +792,24 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
     chrome.storage.internal.get(fileIdKey, getCallback);
 }
 
+
+// This function retrieves the local file status, if it exists.  Otherwise, it yields null.
+function getFileSyncStatus(fileName, successCallback) {
+    var fileIdKey = constructFileIdKey(fileName);
+    var getCallback = function(items) {
+        if (items[fileIdKey]) {
+            // If the file id has been cached, use it.
+            console.log('Drive file id ' + items[fileIdKey].driveId + ' for file ' + fileName + ' has sync status ' + items[fileIdKey].syncStatus);
+            successCallback(items[fileIdKey].syncStatus);
+        } else {
+            console.log('Sync status for file ' + fileName + ' not found.');
+            successCallback(null);
+        }
+    };
+
+    chrome.storage.internal.get(fileIdKey, getCallback);
+}
+
 // This function returns a key to use for file id caching.
 function constructFileIdKey(entryName) {
     return SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-' + entryName;
@@ -803,12 +821,12 @@ function extractFileName(key) {
 }
 
 // This function caches the given Drive id.
-function cacheDriveId(fileName, driveId, callback) {
+function cacheDriveId(fileName, driveId, syncStatus, callback) {
     var fileIdObject = { };
     var key = constructFileIdKey(fileName);
-    fileIdObject[key] = driveId;
+    fileIdObject[key] = {fileName: fileName, driveId: driveId, syncStatus: syncStatus};
     var setCallback = function() {
-        console.log('Drive id for ' + fileName + ' saved to cache.');
+        console.log('Drive id ' + driveId + ' for ' + fileName + ' saved to cache.');
         if (callback) {
             callback();
         }
@@ -961,19 +979,26 @@ exports.getConflictResolutionPolicy = function(callback) {
 exports.getUsageAndQuota = function(fileSystem, callback) {
     // TODO(maxw): Implement this!
     console.log('getUsageAndQuota');
+    callback();
 };
 
 exports.getFileStatus = function(fileEntry, callback) {
-    // TODO(maxw): Implement this!
-    console.log('getFileStatus');
     if (callback) {
-        callback(fileEntry, FILE_STATUS_SYNCED);
+        getFileSyncStatus(fileEntry.name, callback)
     }
 };
 
 exports.getFileStatuses = function(fileEntries, callback) {
     // TODO(maxw): Implement this!
     console.log('getFileStatuses');
+    
+    var statuses = [];
+    for (var entry in fileEntries) {
+        statues.push({Entry: entry, FileStatus: null});
+    }
+    if (callback) {
+        callback(statuses);
+    }
 };
 
 exports.getServiceStatus = function(callback) {
