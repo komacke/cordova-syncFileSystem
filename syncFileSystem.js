@@ -4,7 +4,7 @@
 
 var runtime = require('cordova-plugin-chrome-apps-runtime.runtime');
 var exec = cordova.require('cordova/exec');
-cordova.require('com.komacke.chromium.syncfilesystem.Identity');
+var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 
 //=======
 // Drive
@@ -227,7 +227,7 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
         getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
     };
 
-    getTokenString(onGetTokenStringSuccess, errorCallback);
+    identity.getTokenString(onGetTokenStringSuccess, errorCallback);
 }
 
 // This function syncs an entry to Drive, creating it if necessary.
@@ -263,7 +263,7 @@ function sync(entry, callback) {
         syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);
     };
 
-    getTokenString(onGetTokenStringSuccess);
+    identity.getTokenString(onGetTokenStringSuccess);
 }
 
 // This function syncs an entry to Drive, given its path, creating it if necessary.
@@ -362,7 +362,7 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
         getFileId(fileEntry.name, parentDirectoryId, onGetFileIdSuccess);
     };
 
-    getTokenString(onGetTokenStringSuccess);
+    identity.getTokenString(onGetTokenStringSuccess);
 }
 
 // This function removes a file or directory from Drive.
@@ -405,7 +405,7 @@ function remove(entry, callback) {
         }
     };
 
-    getTokenString(onGetTokenStringSuccess);
+    identity.getTokenString(onGetTokenStringSuccess);
 }
 
 // This function creates the app's syncable directory on Drive.
@@ -437,7 +437,7 @@ function createDirectory(directoryName, parentDirectoryId, callback) {
         xhr.send(JSON.stringify(data));
     };
 
-    getTokenString(onGetTokenStringSuccess);
+    identity.getTokenString(onGetTokenStringSuccess);
 }
 
 //--------------------
@@ -543,7 +543,7 @@ function getDriveChanges(successCallback, errorCallback) {
         chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, getCallback);
     };
 
-    getTokenString(onGetTokenStringSuccess, errorCallback);
+    identity.getTokenString(onGetTokenStringSuccess, errorCallback);
 }
 
 // This function retrieves the file name for the given file id from local storage.
@@ -706,7 +706,7 @@ function getDriveFileId(query, successCallback, errorCallback) {
         xhr.send();
     };
 
-    getTokenString(onGetTokenStringSuccess);
+    identity.getTokenString(onGetTokenStringSuccess);
 }
 
 // This function gets the Drive file id for the directory with the given name and parent id.
