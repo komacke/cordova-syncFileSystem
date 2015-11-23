@@ -25,8 +25,7 @@
     <!-- should this be com.komacke.chromium? right now want compatible with chrome apps -->
     <clobbers target="chrome.syncFileSystem" />
   </js-module>
-
-  <asset src="www/identity.js" target="identity.js" />
+  <js-module src="js/identity.js" name="Identity" />
 
   <platform name="ios">
     <source-file src="src/ios/SyncFileSystem.m" />

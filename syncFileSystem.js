@@ -4,6 +4,7 @@
 
 var runtime = require('cordova-plugin-chrome-apps-runtime.runtime');
 var exec = cordova.require('cordova/exec');
+cordova.require('Identity');
 
 //=======
 // Drive
