@@ -499,6 +499,8 @@ function getDriveChanges(successCallback, errorCallback) {
                                     numRelevantChanges++;
                                     var onGetFileIdSuccess = function(fileIdInfo) {
                                         if (fileIdInfo.modifiedDate == changedFile.modifiedDate) {
+                                            console.log("modfied date unchanged so do nothing: " + changedFile.title);
+                                        } else {
                                             console.log('Downloading ' + changedFile.title + '.');
                                             var onDownloadFileSuccess = function(fileEntry) {
                                                 // TODO(maxw): Determine if the synced file has been created rather than updated.
@@ -510,8 +512,6 @@ function getDriveChanges(successCallback, errorCallback) {
                                                 cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, FILE_STATUS_SYNCED, null);
                                             };
                                             downloadFile(changedFile, onDownloadFileSuccess);
-                                        } else {
-                                            console.log("modfied date unchanged so do nothing: " + changedFile.title);
                                         }
                                     }
                                     getFileId(changedFile.title, _syncableAppDirectoryId, onGetFileIdSuccess);
@@ -771,11 +771,11 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
             var query;
             if (slashIndex < 0) {
                 query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and trashed = false';
-                var augmentedSuccessCallback = function(fileIdInfo) {
+                var augmentedSuccessCallback = function(driveIdInfo) {
                     var onCacheDriveIdSuccess = function() {
-                        successCallback(fileIdInfo);
+                        successCallback(driveIdInfo);
                     };
-                    cacheDriveId(fileName, fileIdInfo.driveId, fileIdInfo.modifiedDate, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 };
                 var errorCallback = function(e) {
                     if (e === FILE_NOT_FOUND_ERROR) {
