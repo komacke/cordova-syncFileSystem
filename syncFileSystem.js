@@ -772,11 +772,15 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
             if (slashIndex < 0) {
                 query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and trashed = false';
                 var augmentedSuccessCallback = function(driveIdInfo) {
+                    console.log("File: " + fileName + " not found in cache.");
+                    successCallback(null);
+/*
                     var onCacheDriveIdSuccess = function() {
                         successCallback(driveIdInfo);
                     };
                     cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
-                };
+ */
+               };
                 var errorCallback = function(e) {
                     if (e === FILE_NOT_FOUND_ERROR) {
                         successCallback(null);
