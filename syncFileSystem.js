@@ -722,7 +722,7 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
                 var onCacheDriveIdSuccess = function() {
                     successCallback(fileIdInfo.driveId);
                 };
-                cacheDriveId(directoryName, fileId, null, FILE_STATUS_NA, onCacheDriveIdSuccess);
+                cacheDriveId(directoryName, fileIdInfo.driveId, fileIdInfo.modifiedDate, FILE_STATUS_NA, onCacheDriveIdSuccess);
             };
 
             // Create the error callback based on whether we should create a directory if it doesn't exist.
@@ -767,9 +767,9 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
                 query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and labels.trashed = false';
                 var augmentedSuccessCallback = function(fileIdInfo) {
                     var onCacheDriveIdSuccess = function() {
-                        successCallback(fileId.driveId);
+                        successCallback(fileIdInfo.driveId);
                     };
-                    cacheDriveId(fileName, fileId, null, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    cacheDriveId(fileName, fileIdInfo.driveId, fileIdInfo.modifiedDate, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 };
                 var errorCallback = function(e) {
                     if (e === FILE_NOT_FOUND_ERROR) {
