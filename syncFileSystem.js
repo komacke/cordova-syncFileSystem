@@ -297,7 +297,8 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
 // This function uploads a file to Drive.
 // TODO(maxw): Implement exponential backoff on 503 (and perhaps other?) responses.
 function uploadFile(fileEntry, parentDirectoryId, callback) {
-    var onGetFileIdSuccess = function(fileId) {
+    var onGetFileIdSuccess = function(fileIdInfo) {
+        var fileId = fileIdInfo[driveId];
         var onFileSuccess = function(file) {
             // Read the file and send its contents.
             var fileReader = new FileReader();
@@ -366,7 +367,9 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
 
 // This function removes a file or directory from Drive.
 function remove(entry, callback) {
-    var onGetIdSuccess = function(fileId) {
+    var onGetIdSuccess = function(fileIdInfo) {
+        var fileId = fileIdInfo[driveId];
+
         // Delete the entry.
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -503,7 +506,7 @@ function getDriveChanges(successCallback, errorCallback) {
                                         for (var i = 0; i < fileStatusListeners.length; i++) {
                                             fileStatusListeners[i](fileInfo);
                                         }
-                                        cacheDriveId(fileEntry.name, change.fileId, FILE_STATUS_SYNCED, null);
+                                        cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, FILE_STATUS_SYNCED, null);
                                     };
                                     downloadFile(changedFile, onDownloadFileSuccess);
                                 }
@@ -709,7 +712,7 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
             successCallback(items[fileIdKey].driveId);
         } else {
             // If the file id has not been cached, query for it, cache it, and pass it on.
-            var query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + directoryName + '" and trashed = false';
+            var query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + directoryName + '" and labels.trashed = false';
             if (parentDirectoryId) {
                 query += ' and "' + parentDirectoryId + '" in parents';
             }
@@ -719,7 +722,7 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
                 var onCacheDriveIdSuccess = function() {
                     successCallback(fileId);
                 };
-                cacheDriveId(directoryName, fileId, FILE_STATUS_NA, onCacheDriveIdSuccess);
+                cacheDriveId(directoryName, fileId, null, FILE_STATUS_NA, onCacheDriveIdSuccess);
             };
 
             // Create the error callback based on whether we should create a directory if it doesn't exist.
@@ -752,7 +755,8 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
     var getCallback = function(items) {
         if (items[fileIdKey]) {
             // If the file id has been cached, use it.
-            console.log('Drive file id ' + items[fileIdKey].driveId + ' for file ' + fileName + ' retrieved from cache.');
+            console.log('Drive file id for file ' + fileName + ' retrieved from cache.');
+            console.log(items[fileIdKey]);
             successCallback(items[fileIdKey].driveId);
         } else {
             // If the file id has not been cached, query for it, cache it, and pass it on.
@@ -760,12 +764,12 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
             var slashIndex = fileName.indexOf('/');
             var query;
             if (slashIndex < 0) {
-                query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and trashed = false';
+                query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and labels.trashed = false';
                 var augmentedSuccessCallback = function(fileId) {
                     var onCacheDriveIdSuccess = function() {
                         successCallback(fileId);
                     };
-                    cacheDriveId(fileName, fileId, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    cacheDriveId(fileName, fileId, null, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 };
                 var errorCallback = function(e) {
                     if (e === FILE_NOT_FOUND_ERROR) {
@@ -823,10 +827,10 @@ function extractFileName(key) {
 }
 
 // This function caches the given Drive id.
-function cacheDriveId(fileName, driveId, syncStatus, callback) {
+function cacheDriveId(fileName, driveId, modifiedDate, syncStatus, callback) {
     var fileIdObject = { };
     var key = constructFileIdKey(fileName);
-    fileIdObject[key] = {fileName: fileName, driveId: driveId, syncStatus: syncStatus};
+    fileIdObject[key] = {fileName: fileName, driveId: driveId, modifiedDate: modifiedDate, syncStatus: syncStatus};
     var setCallback = function() {
         console.log('Drive id ' + driveId + ' for ' + fileName + ' saved to cache.');
         if (callback) {
