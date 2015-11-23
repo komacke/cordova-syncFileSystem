@@ -142,7 +142,7 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
             enableSyncabilityForFileEntry(fileEntry);
 
             // Only sync if the file is being created and not merely retrieved.
-            if (options.create) {
+/*            if (options.create) {
                 var onSyncSuccess = function() {
                     if (typeof successCallback === 'function') {
                         successCallback(fileEntry);
@@ -154,6 +154,8 @@ function enableSyncabilityForDirectoryEntry(directoryEntry) {
                     successCallback(fileEntry);
                 }
             }
+            */
+                    successCallback(fileEntry);
         };
 
         // Call the original function.  The augmented success callback will take care of the syncability addition work.
@@ -272,11 +274,7 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
     if (slashIndex < 0) {
         // We're done diving and can sync the entry.
         if (entry.isFile) {
-            var onGetFileIdSuccess = function(fileId) {
-                if (fileId != FILE_STATUS_SYNCED)
-                    uploadFile(entry, currentDirectoryId /* parentDirectoryId */, callback);
-            }
-            getFileId(entry.name, currentDirectoryId, onGetFileIdSuccess);
+            uploadFile(entry, currentDirectoryId /* parentDirectoryId */, callback);
         } else if (entry.isDirectory) {
             nextDirectoryName = pathRemainder;
             onGetDirectoryIdSuccess = function(directoryId) {
