@@ -497,7 +497,7 @@ function getDriveChanges(successCallback, errorCallback) {
                                 if (changedFile.parents[j].id === _syncableAppDirectoryId) {
                                     // TODO(maxw): Determine if the file has actually been changed, rather than, for example, moved.
                                     numRelevantChanges++;
-                                    var onGetFileIdSuccess(fileIdInfo) {
+                                    var onGetFileIdSuccess = function(fileIdInfo) {
                                         if (fileIdInfo.modifiedDate == changedFile.modifiedDate) {
                                             console.log('Downloading ' + changedFile.title + '.');
                                             var onDownloadFileSuccess = function(fileEntry) {
