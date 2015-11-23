@@ -718,11 +718,11 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
             }
             var errorCallback;
 
-            var augmentedSuccessCallback = function(fileIdInfo) {
+            var augmentedSuccessCallback = function(driveIdInfo) {
                 var onCacheDriveIdSuccess = function() {
-                    successCallback(fileIdInfo.driveId);
+                    successCallback(driveIdInfo.id);
                 };
-                cacheDriveId(directoryName, fileIdInfo.driveId, fileIdInfo.modifiedDate, FILE_STATUS_NA, onCacheDriveIdSuccess);
+                cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, FILE_STATUS_NA, onCacheDriveIdSuccess);
             };
 
             // Create the error callback based on whether we should create a directory if it doesn't exist.
