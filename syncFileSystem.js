@@ -681,7 +681,7 @@ function getDriveFileId(query, successCallback, errorCallback) {
                         errorCallback(FILE_NOT_FOUND_ERROR);
                     } else if (items.length == 1) {
                         console.log('  File found with id: ' + items[0].id + '.');
-                        successCallback(items[0].id);
+                        successCallback(items[0]);
                     } else {
                         console.log('  Multiple (' + items.length + ') copies found.');
                         errorCallback(MULTIPLE_FILES_FOUND_ERROR);
@@ -718,9 +718,9 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
             }
             var errorCallback;
 
-            var augmentedSuccessCallback = function(fileId) {
+            var augmentedSuccessCallback = function(fileIdInfo) {
                 var onCacheDriveIdSuccess = function() {
-                    successCallback(fileId);
+                    successCallback(fileIdInfo.driveId);
                 };
                 cacheDriveId(directoryName, fileId, null, FILE_STATUS_NA, onCacheDriveIdSuccess);
             };
@@ -757,7 +757,7 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
             // If the file id has been cached, use it.
             console.log('Drive file id for file ' + fileName + ' retrieved from cache.');
             console.log(items[fileIdKey]);
-            successCallback(items[fileIdKey].driveId);
+            successCallback(items[fileIdKey]);
         } else {
             // If the file id has not been cached, query for it, cache it, and pass it on.
             // In order to support paths, we need to call this function recursively.
@@ -765,9 +765,9 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
             var query;
             if (slashIndex < 0) {
                 query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and labels.trashed = false';
-                var augmentedSuccessCallback = function(fileId) {
+                var augmentedSuccessCallback = function(fileIdInfo) {
                     var onCacheDriveIdSuccess = function() {
-                        successCallback(fileId);
+                        successCallback(fileId.driveId);
                     };
                     cacheDriveId(fileName, fileId, null, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 };
@@ -784,8 +784,8 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
                 var nextDirectory = fileName.substring(0, slashIndex);
                 var pathRemainder = fileName.substring(slashIndex + 1);
                 query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + nextDirectory + '" and "' + parentDirectoryId + '" in parents and trashed = false';
-                var onGetDriveFileIdSuccess = function(fileId) {
-                    getFileId(pathRemainder, fileId, successCallback);
+                var onGetDriveFileIdSuccess = function(fileIdInfo) {
+                    getFileId(pathRemainder, fileIdInfo.driveId, successCallback);
                 };
                 var onGetDriveFileIdError = function(e) {
                     console.log('Retrieval of directory "' + nextDirectory + '" failed with error ' + e);
