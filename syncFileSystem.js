@@ -498,7 +498,7 @@ function getDriveChanges(successCallback, errorCallback) {
                                     // TODO(maxw): Determine if the file has actually been changed, rather than, for example, moved.
                                     numRelevantChanges++;
                                     var onGetFileIdSuccess = function(fileIdInfo) {
-                                        if (fileIdInfo.modifiedDate == changedFile.modifiedDate) {
+                                        if (fileIdInfo && fileIdInfo.modifiedDate == changedFile.modifiedDate) {
                                             console.log("modfied date unchanged so do nothing: " + changedFile.title);
                                         } else {
                                             console.log('Downloading ' + changedFile.title + '.');
