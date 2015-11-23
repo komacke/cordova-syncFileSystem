@@ -509,10 +509,10 @@ function getDriveChanges(successCallback, errorCallback) {
                                                 }
                                                 cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, FILE_STATUS_SYNCED, null);
                                             };
+                                            downloadFile(changedFile, onDownloadFileSuccess);
                                         } else {
                                             console.log("modfied date unchanged so do nothing: " + changedFile.title);
                                         }
-                                        downloadFile(changedFile, onDownloadFileSuccess);
                                     }
                                     getFileId(changedFile.title, _syncableAppDirectoryId, onGetFileIdSuccess);
                                 }
