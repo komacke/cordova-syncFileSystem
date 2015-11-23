@@ -497,17 +497,24 @@ function getDriveChanges(successCallback, errorCallback) {
                                 if (changedFile.parents[j].id === _syncableAppDirectoryId) {
                                     // TODO(maxw): Determine if the file has actually been changed, rather than, for example, moved.
                                     numRelevantChanges++;
-                                    console.log('Downloading ' + changedFile.title + '.');
-                                    var onDownloadFileSuccess = function(fileEntry) {
-                                        // TODO(maxw): Determine if the synced file has been created rather than updated.
-                                        // Inform the listeners.
-                                        var fileInfo = { fileEntry: fileEntry, status: FILE_STATUS_SYNCED, action: SYNC_ACTION_UPDATED, direction: SYNC_DIRECTION_REMOTE_TO_LOCAL };
-                                        for (var i = 0; i < fileStatusListeners.length; i++) {
-                                            fileStatusListeners[i](fileInfo);
+                                    var onGetFileIdSuccess(fileIdInfo) {
+                                        if (fileIdInfo.modifiedDate == changedFile.modifiedDate) {
+                                            console.log('Downloading ' + changedFile.title + '.');
+                                            var onDownloadFileSuccess = function(fileEntry) {
+                                                // TODO(maxw): Determine if the synced file has been created rather than updated.
+                                                // Inform the listeners.
+                                                var fileInfo = { fileEntry: fileEntry, status: FILE_STATUS_SYNCED, action: SYNC_ACTION_UPDATED, direction: SYNC_DIRECTION_REMOTE_TO_LOCAL };
+                                                for (var i = 0; i < fileStatusListeners.length; i++) {
+                                                    fileStatusListeners[i](fileInfo);
+                                                }
+                                                cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, FILE_STATUS_SYNCED, null);
+                                            };
+                                        } else {
+                                            console.log("modfied date unchanged so do nothing: " + changedFile.title);
                                         }
-                                        cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, FILE_STATUS_SYNCED, null);
-                                    };
-                                    downloadFile(changedFile, onDownloadFileSuccess);
+                                        downloadFile(changedFile, onDownloadFileSuccess);
+                                    }
+                                    getFileId(changedFile.title, _syncableAppDirectoryId, onGetFileIdSuccess);
                                 }
                             }
                         }
@@ -766,7 +773,7 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
                 query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and trashed = false';
                 var augmentedSuccessCallback = function(fileIdInfo) {
                     var onCacheDriveIdSuccess = function() {
-                        successCallback(fileIdInfo.driveId);
+                        successCallback(fileIdInfo);
                     };
                     cacheDriveId(fileName, fileIdInfo.driveId, fileIdInfo.modifiedDate, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 };
