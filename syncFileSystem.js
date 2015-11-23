@@ -712,7 +712,7 @@ function getDirectoryId(directoryName, parentDirectoryId, shouldCreateDirectory,
             successCallback(items[fileIdKey].driveId);
         } else {
             // If the file id has not been cached, query for it, cache it, and pass it on.
-            var query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + directoryName + '" and labels.trashed = false';
+            var query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + directoryName + '" and trashed = false';
             if (parentDirectoryId) {
                 query += ' and "' + parentDirectoryId + '" in parents';
             }
@@ -764,7 +764,7 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
             var slashIndex = fileName.indexOf('/');
             var query;
             if (slashIndex < 0) {
-                query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and labels.trashed = false';
+                query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and trashed = false';
                 var augmentedSuccessCallback = function(fileIdInfo) {
                     var onCacheDriveIdSuccess = function() {
                         successCallback(fileIdInfo.driveId);
