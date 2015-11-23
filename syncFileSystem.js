@@ -790,8 +790,8 @@ function getFileId(fileName, parentDirectoryId, successCallback) {
                 var nextDirectory = fileName.substring(0, slashIndex);
                 var pathRemainder = fileName.substring(slashIndex + 1);
                 query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + nextDirectory + '" and "' + parentDirectoryId + '" in parents and trashed = false';
-                var onGetDriveFileIdSuccess = function(fileIdInfo) {
-                    getFileId(pathRemainder, fileIdInfo.driveId, successCallback);
+                var onGetDriveFileIdSuccess = function(driveIdInfo) {
+                    getFileId(pathRemainder, driveIdInfo.id, successCallback);
                 };
                 var onGetDriveFileIdError = function(e) {
                     console.log('Retrieval of directory "' + nextDirectory + '" failed with error ' + e);
