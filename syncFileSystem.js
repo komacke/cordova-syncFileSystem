@@ -298,7 +298,6 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
 // TODO(maxw): Implement exponential backoff on 503 (and perhaps other?) responses.
 function uploadFile(fileEntry, parentDirectoryId, callback) {
     var onGetFileIdSuccess = function(fileIdInfo) {
-        var fileId = fileIdInfo[driveId];
         var onFileSuccess = function(file) {
             // Read the file and send its contents.
             var fileReader = new FileReader();
@@ -339,9 +338,9 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                 };
 
                 // If there's a file id, update the file.  Otherwise, upload it anew.
-                if (fileId) {
+                if (fileIdInfo) {
                     fileAction = SYNC_ACTION_UPDATED;
-                    xhr.open('PUT', 'https://www.googleapis.com/upload/drive/v2/files/' + fileId + '?uploadType=multipart');
+                    xhr.open('PUT', 'https://www.googleapis.com/upload/drive/v2/files/' + fileIdInfo[driveId] + '?uploadType=multipart');
                 } else {
                     fileAction = SYNC_ACTION_ADDED;
                     xhr.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
