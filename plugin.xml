@@ -26,6 +26,8 @@
     <clobbers target="chrome.syncFileSystem" />
   </js-module>
 
+  <asset src="www/identity.js" target="identity.js" />
+
   <platform name="ios">
     <source-file src="src/ios/SyncFileSystem.m" />
     <header-file src="src/ios/SyncFileSystem.h" />
