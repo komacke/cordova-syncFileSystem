@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-var runtime = require('cordova-plugin-chrome-apps-runtime.runtime');
 var exec = cordova.require('cordova/exec');
 var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 var idm = cordova.require('com.komacke.chromium.syncfilesystem.IdManagement');
@@ -212,7 +211,7 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
     };
     var onGetSyncableRootDirectoryIdSuccess = function(syncableRootDirectoryId) {
         // Get the app directory id.
-        idm.getDirectoryId(runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
+        idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
     };
     var onGetTokenStringSuccess = function() {
         // Get the Drive "Chrome Syncable FileSystem" directory id.
@@ -228,7 +227,7 @@ function sync(entry, callback) {
         // Drive, unfortunately, does not allow searching by path.
         // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
         var pathRemainder = entry.fullPath;
-        var appIdIndex = pathRemainder.indexOf(runtime.id);
+        var appIdIndex = pathRemainder.indexOf(chrome.runtime.id);
 
         // If the app id isn't in the path, we can't sync it.
         if (appIdIndex < 0) {
@@ -251,7 +250,7 @@ function sync(entry, callback) {
         };
 
         // Using the remainder of the path, start the recursive process of drilling down.
-        pathRemainder = pathRemainder.substring(appIdIndex + runtime.id.length + 1);
+        pathRemainder = pathRemainder.substring(appIdIndex + chrome.runtime.id.length + 1);
         syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);
     };
 
@@ -381,7 +380,7 @@ function remove(entry, callback) {
     };
     var onGetTokenStringSuccess = function() {
         // Get the file id and pass it on.
-        var appIdIndex = entry.fullPath.indexOf(runtime.id);
+        var appIdIndex = entry.fullPath.indexOf(chrome.runtime.id);
 
         // If the app id isn't in the path, we can't remove it.
         if (appIdIndex < 0) {
@@ -389,7 +388,7 @@ function remove(entry, callback) {
             return;
         }
 
-        var relativePath = entry.fullPath.substring(appIdIndex + runtime.id.length + 1);
+        var relativePath = entry.fullPath.substring(appIdIndex + chrome.runtime.id.length + 1);
         if (entry.isFile) {
             idm.getFileId(relativePath, _syncableAppDirectoryId, onGetIdSuccess);
         } else {
@@ -440,7 +439,7 @@ function createDirectory(directoryName, parentDirectoryId, callback) {
 // successCallback: function(numChanges)
 // errorCallback: function()
 function getDriveChanges(successCallback, errorCallback) {
-    var NEXT_CHANGE_ID_KEY = C.SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-next_change_id';
+    var NEXT_CHANGE_ID_KEY = C.SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-next_change_id';
     var onGetTokenStringSuccess = function() {
         // Send a request to retrieve the changes.
         var xhr = new XMLHttpRequest();
@@ -644,7 +643,7 @@ function saveData(fileName, data, callback) {
 //=======================
 
 exports.requestFileSystem = function(callback) {
-    var manifest = runtime.getManifest();
+    var manifest = chrome.runtime.getManifest();
     if (!manifest) {
         throw new Error("Manifest does not exist and was not set.");
     }
@@ -719,7 +718,7 @@ exports.requestFileSystem = function(callback) {
         };
 
         // TODO(maxw): Make the directory name app-specific.
-        fileSystem.root.getDirectory(runtime.id, getDirectoryFlags, onGetDirectorySuccess, onGetDirectoryFailure);
+        fileSystem.root.getDirectory(chrome.runtime.id, getDirectoryFlags, onGetDirectorySuccess, onGetDirectoryFailure);
     };
     var onRequestFileSystemFailure = function(e) {
         console.log("Failed to get file system.");
