@@ -6,6 +6,7 @@ var runtime = require('cordova-plugin-chrome-apps-runtime.runtime');
 var exec = cordova.require('cordova/exec');
 var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 var idm = cordova.require('com.komacke.chromium.syncfilesystem.IdManagement');
+var C = cordova.require('com.komacke.chromium.syncfilesystem.Constants');
 
 //=======
 // Drive
@@ -32,32 +33,6 @@ var pollTimer = null;
 
 var localDirectoryEntry;
 
-//-----------
-// Constants
-//-----------
-
-var SYNC_ACTION_ADDED = 'added';
-var SYNC_ACTION_DELETED = 'deleted';
-var SYNC_ACTION_UPDATED = 'updated';
-
-var FILE_STATUS_CONFLICTING = 'conflicting';
-var FILE_STATUS_PENDING = 'pending';
-var FILE_STATUS_SYNCED = 'synced';
-var FILE_STATUS_NA = null;
-
-var SYNC_DIRECTION_LOCAL_TO_REMOTE = 'local_to_remote';
-var SYNC_DIRECTION_REMOTE_TO_LOCAL = 'remote_to_local';
-
-var CONFLICT_RESOLUTION_POLICY_LAST_WRITE_WIN = 'last_write_win';
-var CONFLICT_RESOLUTION_POLICY_MANUAL = 'manual';
-
-var SYNC_FILE_SYSTEM_PREFIX = 'sfs';
-
-// Error codes.
-var FILE_NOT_FOUND_ERROR = 1;
-var MULTIPLE_FILES_FOUND_ERROR = 2;
-var REQUEST_FAILED_ERROR = 3;
-
 //----------------------------------
 // FileSystem function augmentation
 //----------------------------------
@@ -77,7 +52,7 @@ function enableSyncabilityForEntry(entry) {
             var onRemoveDriveIdFromCacheSuccess = function() {
                 // If a file was removed, fire the file status listener.
                 if (entry.isFile) {
-                    var fileInfo = { fileEntry: entry, status: FILE_STATUS_SYNCED, action: SYNC_ACTION_DELETED, direction: SYNC_DIRECTION_LOCAL_TO_REMOTE };
+                    var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: C.SYNC_ACTION_DELETED, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
                     for (var i = 0; i < fileStatusListeners.length; i++) {
                         fileStatusListeners[i](fileInfo);
                     }
@@ -264,7 +239,7 @@ function sync(entry, callback) {
         // Augment the callback to fire the status listener, but only if we've synced a file, not a directory.
         var augmentedCallback = function(fileAction) {
             if (entry.isFile) {
-                var fileInfo = { fileEntry: entry, status: FILE_STATUS_SYNCED, action: fileAction, direction: SYNC_DIRECTION_LOCAL_TO_REMOTE };
+                var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: fileAction, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
                 for (var i = 0; i < fileStatusListeners.length; i++) {
                     fileStatusListeners[i](fileInfo);
                 }
@@ -357,10 +332,10 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
 
                 // If there's a file id, update the file.  Otherwise, upload it anew.
                 if (fileIdInfo) {
-                    fileAction = SYNC_ACTION_UPDATED;
+                    fileAction = C.SYNC_ACTION_UPDATED;
                     xhr.open('PUT', 'https://www.googleapis.com/upload/drive/v2/files/' + fileIdInfo[driveId] + '?uploadType=multipart');
                 } else {
-                    fileAction = SYNC_ACTION_ADDED;
+                    fileAction = C.SYNC_ACTION_ADDED;
                     xhr.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
                 }
                 xhr.setRequestHeader('Content-Type', 'multipart/related; boundary=' + boundary);
@@ -465,7 +440,7 @@ function createDirectory(directoryName, parentDirectoryId, callback) {
 // successCallback: function(numChanges)
 // errorCallback: function()
 function getDriveChanges(successCallback, errorCallback) {
-    var NEXT_CHANGE_ID_KEY = SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-next_change_id';
+    var NEXT_CHANGE_ID_KEY = C.SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-next_change_id';
     var onGetTokenStringSuccess = function() {
         // Send a request to retrieve the changes.
         var xhr = new XMLHttpRequest();
@@ -496,7 +471,7 @@ function getDriveChanges(successCallback, errorCallback) {
                                     console.log('Deleting ' + fileName + '.');
                                     var onDeleteFileSuccess = function(fileEntry) {
                                         // Inform the listeners.
-                                        var fileInfo = { fileEntry: fileEntry, status: FILE_STATUS_SYNCED, action: SYNC_ACTION_DELETED, direction: SYNC_DIRECTION_REMOTE_TO_LOCAL };
+                                        var fileInfo = { fileEntry: fileEntry, status: C.FILE_STATUS_SYNCED, action: C.SYNC_ACTION_DELETED, direction: C.SYNC_DIRECTION_REMOTE_TO_LOCAL };
                                         for (var i = 0; i < fileStatusListeners.length; i++) {
                                             fileStatusListeners[i](fileInfo);
                                         }
@@ -523,11 +498,11 @@ function getDriveChanges(successCallback, errorCallback) {
                                             var onDownloadFileSuccess = function(fileEntry) {
                                                 // TODO(maxw): Determine if the synced file has been created rather than updated.
                                                 // Inform the listeners.
-                                                var fileInfo = { fileEntry: fileEntry, status: FILE_STATUS_SYNCED, action: SYNC_ACTION_UPDATED, direction: SYNC_DIRECTION_REMOTE_TO_LOCAL };
+                                                var fileInfo = { fileEntry: fileEntry, status: C.FILE_STATUS_SYNCED, action: C.SYNC_ACTION_UPDATED, direction: C.SYNC_DIRECTION_REMOTE_TO_LOCAL };
                                                 for (var i = 0; i < fileStatusListeners.length; i++) {
                                                     fileStatusListeners[i](fileInfo);
                                                 }
-                                                idm.cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, FILE_STATUS_SYNCED, null);
+                                                idm.cacheDriveId(fileEntry.name, change.fileId, change.modificationDate, C.FILE_STATUS_SYNCED, null);
                                             };
                                             downloadFile(changedFile, onDownloadFileSuccess);
                                         }
@@ -687,7 +662,7 @@ exports.requestFileSystem = function(callback) {
         var fileSystem = entry.filesystem;
         
         // Set the default conflict resolution policy.
-        conflictResolutionPolicy = CONFLICT_RESOLUTION_POLICY_LAST_WRITE_WIN;
+        conflictResolutionPolicy = C.CONFLICT_RESOLUTION_POLICY_LAST_WRITE_WIN;
 
         // Create or get the subdirectory for this app.
         var getDirectoryFlags = { create: true, exclusive: false };
@@ -882,7 +857,7 @@ exports.resetSyncFileSystem = function (callback) {
     localDirectoryEntry.removeRecursively(function() {
       // Reset the "next change" counter
       reset = {};
-      reset[SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-next_change_id'] = 1;
+      reset[C.SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-next_change_id'] = 1;
       chrome.storage.internal.set(reset, function() {
         // Restart the sync process
         exports.requestFileSystem(callback);

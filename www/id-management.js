@@ -2,6 +2,8 @@
 // ID management with Drive and managing sync status
 //----------------------------
 
+var C = cordova.require('com.komacke.chromium.syncfilesystem.Constants');
+
 // This function retrieves the file name for the given file id from local storage.
 exports.getFileNameForFileId = function(fileId, callback) {
     var getCallback = function(items) {
@@ -36,17 +38,17 @@ getDriveFileId = function(query, successCallback, errorCallback) {
                     var items = JSON.parse(xhr.responseText).items;
                     if (items.length === 0) {
                         console.log('  File not found.');
-                        errorCallback(FILE_NOT_FOUND_ERROR);
+                        errorCallback(C.FILE_NOT_FOUND_ERROR);
                     } else if (items.length == 1) {
                         console.log('  File found with id: ' + items[0].id + '.');
                         successCallback(items[0]);
                     } else {
                         console.log('  Multiple (' + items.length + ') copies found.');
-                        errorCallback(MULTIPLE_FILES_FOUND_ERROR);
+                        errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
                     }
                 } else {
                     console.log('  Search failed with status ' + xhr.status + '.');
-                    errorCallback(REQUEST_FAILED_ERROR);
+                    errorCallback(C.REQUEST_FAILED_ERROR);
                 }
             }
         };
@@ -80,13 +82,13 @@ exports.getDirectoryId = function(directoryName, parentDirectoryId, shouldCreate
                 var onCacheDriveIdSuccess = function() {
                     successCallback(driveIdInfo.id);
                 };
-                exports.cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, FILE_STATUS_NA, onCacheDriveIdSuccess);
+                exports.cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_NA, onCacheDriveIdSuccess);
             };
 
             // Create the error callback based on whether we should create a directory if it doesn't exist.
             if (shouldCreateDirectory) {
                 errorCallback = function(e) {
-                    if (e === FILE_NOT_FOUND_ERROR) {
+                    if (e === C.FILE_NOT_FOUND_ERROR) {
                         // If the directory doesn't exist, create it.
                         createDirectory(directoryName, parentDirectoryId, augmentedSuccessCallback);
                     } else {
@@ -130,11 +132,11 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
                     var onCacheDriveIdSuccess = function() {
                         successCallback(driveIdInfo);
                     };
-                    cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
  */
                };
                 var errorCallback = function(e) {
-                    if (e === FILE_NOT_FOUND_ERROR) {
+                    if (e === C.FILE_NOT_FOUND_ERROR) {
                         successCallback(null);
                     } else {
                         // If it's a different error, log it.
@@ -179,7 +181,7 @@ exports.getFileSyncStatus = function(fileName, successCallback) {
 
 // This function returns a key to use for file id caching.
 constructFileIdKey = function(entryName) {
-    return SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-' + entryName;
+    return C.SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-' + entryName;
 }
 
 // This function returns the file name associated with the given cached file id key.
