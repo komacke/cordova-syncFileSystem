@@ -80,10 +80,14 @@ exports.getDirectoryId = function(directoryName, parentDirectoryId, shouldCreate
             var errorCallback;
 
             var augmentedSuccessCallback = function(driveIdInfo) {
-                var onCacheDriveIdSuccess = function() {
-                    successCallback(driveIdInfo.id);
-                };
-                exports.cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_NA, onCacheDriveIdSuccess);
+                if (driveIdInfo == null)
+                    successCallback(driveIdInfo);
+                else {
+                    var onCacheDriveIdSuccess = function() {
+                        successCallback(driveIdInfo.id);
+                    };
+                    exports.cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_NA, onCacheDriveIdSuccess);
+                }
             };
 
             // Create the error callback based on whether we should create a directory if it doesn't exist.
@@ -150,7 +154,10 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
                 var pathRemainder = fileName.substring(slashIndex + 1);
                 query = 'mimeType = "application/vnd.google-apps.folder" and title = "' + nextDirectory + '" and "' + parentDirectoryId + '" in parents and trashed = false';
                 var onGetDriveFileIdSuccess = function(driveIdInfo) {
-                    exports.getFileId(pathRemainder, driveIdInfo.id, successCallback);
+                    if (driveIdInfo == null)
+                        console.log(nextDirectory + " does not exist.");
+                    else
+                        exports.getFileId(pathRemainder, driveIdInfo.id, successCallback);
                 };
                 var onGetDriveFileIdError = function(e) {
                     console.log('Retrieval of directory "' + nextDirectory + '" failed with error ' + e);
