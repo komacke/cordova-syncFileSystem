@@ -133,7 +133,7 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
                     var onCacheDriveIdSuccess = function() {
                         successCallback(driveIdInfo);
                     };
-                    cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    exports.cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
  */
                };
                 var errorCallback = function(e) {
