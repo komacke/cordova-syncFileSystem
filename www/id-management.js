@@ -181,12 +181,12 @@ exports.getFileSyncStatus = function(fileName, successCallback) {
 
 // This function returns a key to use for file id caching.
 constructFileIdKey = function(entryName) {
-    return C.SYNC_FILE_SYSTEM_PREFIX + '-' + runtime.id + '-' + entryName;
+    return C.SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-' + entryName;
 }
 
 // This function returns the file name associated with the given cached file id key.
 extractFileName = function(key) {
-    return key.substring(key.indexOf(runtime.id) + runtime.id.length + 1);
+    return key.substring(key.indexOf(chrome.runtime.id) + chrome.runtime.id.length + 1);
 }
 
 // This function caches the given Drive id.
