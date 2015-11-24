@@ -21,11 +21,12 @@
   <dependency id="cordova-plugin-chrome-apps-identity" />
   <dependency id="cordova-plugin-file" />
 
-  <js-module src="syncFileSystem.js" name="SyncFileSystem">
+  <js-module src="www/syncFileSystem.js" name="SyncFileSystem">
     <!-- should this be com.komacke.chromium? right now want compatible with chrome apps -->
     <clobbers target="chrome.syncFileSystem" />
   </js-module>
-  <js-module src="js/identity.js" name="Identity" />
+  <js-module src="www/identity.js" name="Identity" />
+  <js-module src="www/id-management.js" name="IdManagement" />
 
   <platform name="ios">
     <source-file src="src/ios/SyncFileSystem.m" />
