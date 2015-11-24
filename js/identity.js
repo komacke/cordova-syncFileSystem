@@ -3,7 +3,7 @@
 //==========
 
 // This function initiates a web auth flow, eventually getting a token string and passing it to the given callback.
-export.getTokenString = function(successCallback, errorCallback) {
+exports.getTokenString = function(successCallback, errorCallback) {
     // Get the auth token.
     chrome.identity.getAuthToken({ interactive: true }, function(token) {
         if (token) {
