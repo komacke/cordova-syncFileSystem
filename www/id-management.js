@@ -22,7 +22,7 @@ exports.getFileNameForFileId = function(fileId, callback) {
 }
 
 // This function gets the Drive file id using the given query.
-getDriveFileId = function(query, successCallback, errorCallback) {
+exports.getDriveFileId = function(query, successCallback, errorCallback) {
     // If there's no error callback provided, make one.
     if (!errorCallback) {
         errorCallback = function(e) {
@@ -103,7 +103,7 @@ exports.getDirectoryId = function(directoryName, parentDirectoryId, shouldCreate
                     console.log('Retrieval of directory "' + directoryName + '" failed with error ' + e);
                 };
             }
-            getDriveFileId(query, augmentedSuccessCallback, errorCallback);
+            exports.getDriveFileId(query, augmentedSuccessCallback, errorCallback);
         }
     };
 
@@ -144,7 +144,7 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
                         console.log('Retrieval of file "' + fileName + '" failed with error ' + e);
                     }
                 };
-                getDriveFileId(query, augmentedSuccessCallback, errorCallback);
+                exports.getDriveFileId(query, augmentedSuccessCallback, errorCallback);
             } else {
                 var nextDirectory = fileName.substring(0, slashIndex);
                 var pathRemainder = fileName.substring(slashIndex + 1);
@@ -155,7 +155,7 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
                 var onGetDriveFileIdError = function(e) {
                     console.log('Retrieval of directory "' + nextDirectory + '" failed with error ' + e);
                 };
-                getDriveFileId(query, onGetDriveFileIdSuccess, onGetDriveFileIdError);
+                exports.getDriveFileId(query, onGetDriveFileIdSuccess, onGetDriveFileIdError);
             }
         }
     };
