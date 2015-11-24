@@ -3,6 +3,7 @@
 //----------------------------
 
 var C = cordova.require('com.komacke.chromium.syncfilesystem.Constants');
+var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 
 // This function retrieves the file name for the given file id from local storage.
 exports.getFileNameForFileId = function(fileId, callback) {
@@ -55,7 +56,7 @@ getDriveFileId = function(query, successCallback, errorCallback) {
 
         xhr.open('GET', 'https://www.googleapis.com/drive/v2/files?q=' + query);
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
         xhr.send();
     };
 

@@ -11,9 +11,6 @@ var C = cordova.require('com.komacke.chromium.syncfilesystem.Constants');
 // Drive
 //=======
 
-// When we get an auth token string, we store it here.
-var _tokenString;
-
 // When we create or get the app's syncable Drive directory, we store its id here.
 var _syncableAppDirectoryId;
 
@@ -339,7 +336,7 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                 }
                 xhr.setRequestHeader('Content-Type', 'multipart/related; boundary=' + boundary);
                 //xhr.setRequestHeader('Content-Length', bodyString.length);
-                xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
+                xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
                 xhr.send(bodyString);
             };
             fileReader.readAsBinaryString(file);
@@ -375,7 +372,7 @@ function remove(entry, callback) {
         };
 
         xhr.open('DELETE', 'https://www.googleapis.com/drive/v2/files/' + fileId);
-        xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
         xhr.send();
     };
     var onGetTokenStringSuccess = function() {
@@ -424,7 +421,7 @@ function createDirectory(directoryName, parentDirectoryId, callback) {
 
         xhr.open('POST', 'https://www.googleapis.com/drive/v2/files');
         xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
+        xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
         xhr.send(JSON.stringify(data));
     };
 
@@ -528,7 +525,7 @@ function getDriveChanges(successCallback, errorCallback) {
 
             // TODO(maxw): Use `nextLink` to get multiple pages of change results.
             xhr.open('GET', 'https://www.googleapis.com/drive/v2/changes?startChangeId=' + nextChangeId + '&includeDeleted=true&includeSubscribed=true&maxResults=1000');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
+            xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
             xhr.send();
         };
         chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, getCallback);
@@ -577,7 +574,7 @@ function downloadFile(file, callback) {
     };
 
     xhr.open('GET', file.downloadUrl);
-    xhr.setRequestHeader('Authorization', 'Bearer ' + _tokenString);
+    xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
     xhr.send();
 }
 
