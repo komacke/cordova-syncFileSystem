@@ -2,6 +2,8 @@
 // Identity
 //==========
 
+var runtime = require('cordova-plugin-chrome-apps-runtime.runtime');
+
 // This function initiates a web auth flow, eventually getting a token string and passing it to the given callback.
 exports.getTokenString = function(successCallback, errorCallback) {
     // Get the auth token.
