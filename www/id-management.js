@@ -39,7 +39,8 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
                     var items = JSON.parse(xhr.responseText).items;
                     if (items.length === 0) {
                         console.log('  File not found.');
-                        errorCallback(C.FILE_NOT_FOUND_ERROR);
+                        successCallback(null);
+                        // errorCallback(C.FILE_NOT_FOUND_ERROR);
                     } else if (items.length == 1) {
                         console.log('  File found with id: ' + items[0].id + '.');
                         successCallback(items[0]);
