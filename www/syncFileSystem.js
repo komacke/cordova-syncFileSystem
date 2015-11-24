@@ -291,6 +291,8 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
             var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
             var onGetDriveFileIdSuccess = function(driveIdInfo) {
                 if (driveIdInfo && driveIdInfo.id == fileIdInfo.driveId) {
+                    console.log("File not uploaded because it's already there: " + fileIdInfo)
+                } else {
                     var onFileSuccess = function(file) {
                         // Read the file and send its contents.
                         var fileReader = new FileReader();
@@ -344,7 +346,6 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                             xhr.send(bodyString);
                         };
                         fileReader.readAsBinaryString(file);
-                        }
                     };
 
                     // Get the file.
