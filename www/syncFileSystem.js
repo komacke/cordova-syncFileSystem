@@ -160,16 +160,16 @@ function enableSyncabilityForFileWriter(fileWriter, fileEntry) {
     fileWriter.write = function(data) {
         // We want to augment the `onwrite` and `onwriteend` listeners to add syncing.
         // TODO(maxw): Augment onwriteend.
-        if (fileWriter.onwriteend) {
-            var originalOnwriteend = fileWriter.onwriteend;
-            fileWriter.onwriteend = function(evt) {
-                var onSyncSuccess = function() {
-                    originalOnwriteend(evt);
-                };
+        if (fileWriter.onwrite) {
+            var originalOnwrite = fileWriter.onwrite;
+            fileWriter.onwrite = function(evt) {
+//                var onSyncSuccess = function() {
+                    originalOnwrite(evt);
+//                };
                 sync(fileEntry, onSyncSuccess);
             };
         } else {
-            fileWriter.onwriteend = function(evt) {
+            fileWriter.onwrite = function(evt) {
                 sync(fileEntry, null);
             };
         }
