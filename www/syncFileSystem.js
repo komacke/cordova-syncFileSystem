@@ -166,7 +166,7 @@ function enableSyncabilityForFileWriter(fileWriter, fileEntry) {
 //                var onSyncSuccess = function() {
                     originalOnwrite(evt);
 //                };
-                sync(fileEntry, onSyncSuccess);
+                sync(fileEntry, null);
             };
         } else {
             fileWriter.onwrite = function(evt) {
