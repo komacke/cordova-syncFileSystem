@@ -215,7 +215,7 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
         // Get the Drive "Chrome Syncable FileSystem" directory id.
             idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
         },
-        errorCallback()
+        errorCallback
     );
 }
 
