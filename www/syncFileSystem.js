@@ -352,7 +352,7 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                     fileEntry.file(onFileSuccess);
                 }
             };
-            idm.getDriveFileId(query, onGetFileIdSuccess, function(e) {console.log("getDriveFileId error: "+e);});
+            idm.getDriveFileId(query, onGetDriveFileIdSuccess, function(e) {console.log("getDriveFileId error: "+e);});
         };
         // Get the file id and pass it on.
         idm.getFileId(fileEntry.name, parentDirectoryId, onGetFileIdSuccess);
