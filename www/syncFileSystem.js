@@ -291,7 +291,8 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
             var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
             var onGetDriveFileIdSuccess = function(driveIdInfo) {
                 if (driveIdInfo && driveIdInfo.id == fileIdInfo.driveId) {
-                    console.log("File not uploaded because it's already there: " + fileIdInfo);
+                    console.log("File not uploaded because it's already there: ";
+                    console.log(fileIdInfo);
                 } else {
                     var onFileSuccess = function(file) {
                         // Read the file and send its contents.
@@ -467,7 +468,7 @@ function getDriveChanges(successCallback, errorCallback) {
                     // For each change received, check whether it's on a file in the syncable app folder.  If so, sync the change locally.
                     for (var i = 0; i < numChanges; i++) {
                         var change = responseJson.items[i];
-                        if (change.deleted) {
+                        if (change.deleted || change.file.explicitlyTrashed) {
                             var onGetFileNameForFileIdSuccess = function(fileName) {
                                 if (fileName) {
                                     // TODO(maxw): Deal with the fact that this is incremented asynchronously (ie. too late) and so isn't mattering.
