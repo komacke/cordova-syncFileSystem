@@ -2,6 +2,13 @@
 
 Dave picking up from tag 0.5.1 to see if I can make it work for my use case.
 
+Example of using this is at https://github.com/komacke/HamLog.
+
+See below for important notes about using chrome.identity and the Drive API.
+
+Good progress. Sync up and down work. Removing files doesn't sync yet. After a sync failure, should figure that out and try again.
+Needs to know it's offline and not try to sync.
+
 # chrome.syncFileSystem Plugin
 
 This plugin allows apps to access a file system that syncs to Google Drive.
@@ -28,11 +35,13 @@ In addition to the manfest changes for `chrome.identity`, you will need to add t
 
 * Only the manual resolution policy is supported.
 * getUsageAndQuota, getFileStatus, and onServiceStatusChanged are not yet implemented.
-* DirectoryEntry.getFile triggers a sync even when an existing file is retrieved.
+* DirectoryEntry.getFile triggers a sync even when an existing file is retrieved. (resolved)
 * Failed sync uploads are not currently retried (until another change triggers another sync attempt).
 * FileEntry.moveTo and FileEntry.copyTo do not trigger syncs.
 
 # Release Notes
+## working on next release ....
+
 ## 0.1.5 (October 21, 2014)
 - Documentation updates.
 
