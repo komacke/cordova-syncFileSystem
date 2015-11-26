@@ -221,8 +221,8 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
 
 // This function syncs an entry to Drive, creating it if necessary.
 function sync(entry, callback) {
-    identity.getTokenString().then(
-//    identity.getTokenStringPromise().then(
+//    identity.getTokenString().then(
+    identity.getTokenStringPromise().then(
         function() {
             // Drive, unfortunately, does not allow searching by path.
             // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
