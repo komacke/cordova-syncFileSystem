@@ -291,7 +291,7 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
             var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
             var onGetDriveFileIdSuccess = function(driveIdInfo) {
                 if (driveIdInfo && driveIdInfo.id == fileIdInfo.driveId) {
-                    console.log("File not uploaded because it's already there: ";
+                    console.log("File not uploaded because it's already there: ");
                     console.log(fileIdInfo);
                 } else {
                     var onFileSuccess = function(file) {
@@ -591,6 +591,7 @@ function downloadFile(file, callback) {
 function saveData(fileName, data, callback) {
     var onGetFileSuccess = function(fileEntry) {
         var onCreateWriterSuccess = function(fileWriter) {
+            // TODO: need to truncate first
             fileWriter.write(data);
             callback(fileEntry);
         };
