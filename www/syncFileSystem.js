@@ -210,48 +210,50 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
         // Get the app directory id.
         idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
     };
-    var onGetTokenStringSuccess = function() {
+    identity.getTokenStringPromise().then(
+        function() {
         // Get the Drive "Chrome Syncable FileSystem" directory id.
-        idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
-    };
-
-    identity.getTokenString(onGetTokenStringSuccess, errorCallback);
+            idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
+        },
+        errorCallback()
+    );
 }
 
 // This function syncs an entry to Drive, creating it if necessary.
 function sync(entry, callback) {
-    var onGetTokenStringSuccess = function() {
-        // Drive, unfortunately, does not allow searching by path.
-        // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
-        var pathRemainder = entry.fullPath;
-        var appIdIndex = pathRemainder.indexOf(chrome.runtime.id);
+    identity.getTokenString().then(
+//    identity.getTokenStringPromise().then(
+        function() {
+            // Drive, unfortunately, does not allow searching by path.
+            // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
+            var pathRemainder = entry.fullPath;
+            var appIdIndex = pathRemainder.indexOf(chrome.runtime.id);
 
-        // If the app id isn't in the path, we can't sync it.
-        if (appIdIndex < 0) {
-            console.log("Entry cannot be synced because it is not a descendant of the app directory.");
-            return;
-        }
+            // If the app id isn't in the path, we can't sync it.
+            if (appIdIndex < 0) {
+                console.log("Entry cannot be synced because it is not a descendant of the app directory.");
+                return;
+            }
 
-        // Augment the callback to fire the status listener, but only if we've synced a file, not a directory.
-        var augmentedCallback = function(fileAction) {
-            if (entry.isFile) {
-                var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: fileAction, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
-                for (var i = 0; i < fileStatusListeners.length; i++) {
-                    fileStatusListeners[i](fileInfo);
+            // Augment the callback to fire the status listener, but only if we've synced a file, not a directory.
+            var augmentedCallback = function(fileAction) {
+                if (entry.isFile) {
+                    var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: fileAction, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
+                    for (var i = 0; i < fileStatusListeners.length; i++) {
+                        fileStatusListeners[i](fileInfo);
+                    }
                 }
-            }
 
-            if (callback) {
-                callback();
-            }
-        };
+                if (callback) {
+                    callback();
+                }
+            };
 
-        // Using the remainder of the path, start the recursive process of drilling down.
-        pathRemainder = pathRemainder.substring(appIdIndex + chrome.runtime.id.length + 1);
-        syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);
-    };
-
-    identity.getTokenString(onGetTokenStringSuccess);
+            // Using the remainder of the path, start the recursive process of drilling down.
+            pathRemainder = pathRemainder.substring(appIdIndex + chrome.runtime.id.length + 1);
+            syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);
+        }
+    );
 }
 
 // This function syncs an entry to Drive, given its path, creating it if necessary.

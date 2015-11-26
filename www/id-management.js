@@ -26,9 +26,10 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
     // If there's no error callback provided, make one.
     if (!errorCallback) {
         errorCallback = function(e) {
-            console.log('Error: ' + e);
+            console.log('getDriveFileId Error: ' + e);
         };
     }
+
     identity.getTokenStringPromise().then(
         function() {
             // Send a request to locate the directory.
