@@ -17,5 +17,5 @@ exports.getJSON = function(url) {
         xhr.setRequestHeader('Content-Type', 'application/json');
         xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
         xhr.send();
-    };
+    });
 }
