@@ -30,7 +30,7 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
         };
     }
 
-    identity.getTokenStringPromise().then(
+    identity.getTokenString().then(
         function() {
             // Send a request to locate the directory.
             var xhr = new XMLHttpRequest();
