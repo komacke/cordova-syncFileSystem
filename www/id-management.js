@@ -4,6 +4,7 @@
 
 var C = cordova.require('com.komacke.chromium.syncfilesystem.Constants');
 var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
+var xhr = cordova.require('com.komacke.chromium.syncfilesystem.Xhr');
 
 // This function retrieves the file name for the given file id from local storage.
 exports.getFileNameForFileId = function(fileId, callback) {
@@ -29,7 +30,7 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
             console.log('getDriveFileId Error: ' + e);
         };
     }
-
+/*
     identity.getTokenString().then(
         function() {
             // Send a request to locate the directory.
@@ -62,8 +63,33 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
             xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
             xhr.send();
         }, 
-        errorCallback()
-    );
+        errorCallback
+    ); */
+    identity.getTokenString().then(function() {
+        return xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query);
+        }, 
+        errorCallback
+    )
+    .then(function(json) {
+        console.log('Successfully searched for file using query: ' + query + '.');
+        var items = json.items;
+        if (items.length === 0) {
+            console.log('  File not found.');
+            successCallback(null);
+            // errorCallback(C.FILE_NOT_FOUND_ERROR);
+        } else if (items.length == 1) {
+            console.log('  File found with id: ' + items[0].id + '.');
+            successCallback(items[0]);
+        } else {
+            console.log('  Multiple (' + items.length + ') copies found.');
+            errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
+        }
+    })
+    .catch(function(e) {
+        console.log(e.stack);
+        errorCallback(e); 
+    });
+
 }
 
 // This function gets the Drive file id for the directory with the given name and parent id.

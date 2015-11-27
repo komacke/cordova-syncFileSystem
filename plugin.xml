@@ -27,6 +27,7 @@
   </js-module>
   <js-module src="www/identity.js" name="Identity" />
   <js-module src="www/id-management.js" name="IdManagement" />
+  <js-module src="www/xhr.js" name="Xhr" />
   <js-module src="www/constants.js" name="Constants" />
 
   <platform name="ios">

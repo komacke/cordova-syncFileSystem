@@ -47,7 +47,7 @@ exports.getTokenStringPromise = function() {
                 }
             });
     });
-}
+}/*
 exports.getTokenString = function(successCallback, errorCallback) {
     var promise = new Promise(function(successCallback, errorCallback) {
         // Get the auth token.
@@ -71,5 +71,26 @@ exports.getTokenString = function(successCallback, errorCallback) {
     } else {
         return promise;        
     }
+}*/
+exports.getTokenString = function(successCallback, errorCallback) {
+    if (! (successCallback || errorCallback) ) {
+        var promise = new Promise(arguments.callee.name);
+    }
+
+    // Get the auth token.
+    chrome.identity.getAuthToken({ interactive: true }, 
+        function(token) {
+            if (token) {
+                exports.tokenString = token;
+                if (typeof successCallback === 'function') {
+                    successCallback();
+                }
+            } else {
+                chrome.runtime.lastError = { message: "Sync: authentication failed." };
+                if (typeof errorCallback === 'function') {
+                    errorCallback();
+                }
+            }
+        });
 }
 
