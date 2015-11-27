@@ -74,7 +74,7 @@ exports.getTokenString = function(successCallback, errorCallback) {
 }*/
 exports.getTokenString = function(successCallback, errorCallback) {
     if (! (successCallback || errorCallback) ) {
-        var promise = new Promise(arguments.callee.name);
+        var promise = new Promise(exports.getTokenString);
     }
 
     // Get the auth token.
