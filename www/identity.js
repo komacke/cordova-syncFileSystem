@@ -67,7 +67,7 @@ exports.getTokenString = function(successCallback, errorCallback) {
             });
     });
     if (successCallback || errorCallback) {
-        promise().then(successCallback, errorCallback);
+        promise.then(successCallback, errorCallback);
     } else {
         return promise;        
     }
