@@ -21,9 +21,13 @@ exports.getTokenString = function(successCallback, errorCallback) {
                     successCallback();
                 }
             } else {
+                // if no errorCallback, then caller doesn't care if offline
                 chrome.runtime.lastError = { message: "Sync: authentication failed." };
                 if (typeof errorCallback === 'function') {
                     errorCallback();
+                } else {
+                    exports.tokenString = null;
+                    successCallback();
                 }
             }
         });

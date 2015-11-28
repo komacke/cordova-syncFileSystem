@@ -215,8 +215,7 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
         function() {
         // Get the Drive "Chrome Syncable FileSystem" directory id.
             idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
-        },
-        errorCallback
+        }
     );
 }
 
@@ -558,7 +557,7 @@ function downloadFile(file, callback) {
     // Send a request to retrieve the changes.
     xhr.get(file.downloadUrl).then(
         function(fileEntry) {
-            return saveData(file.title, xhr.responseText);
+            return saveData(file.title, fileEntry);
         },
         function(e) {
             console.log('Get download failed with status ' + e + '.');
