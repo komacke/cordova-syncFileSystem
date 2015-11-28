@@ -367,25 +367,10 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
 function remove(entry, callback) {
     var onGetIdSuccess = function(fileIdInfo) {
         var fileId = fileIdInfo[driveId];
-
-        // Delete the entry.
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200 || xhr.status === 204) {
-                    console.log('File removed!');
-                    callback();
-                } else {
-                    console.log('Failed to remove entry with status ' + xhr.status + '.');
-                }
-            }
-        };
-
-        xhr.open('DELETE', 'https://www.googleapis.com/drive/v2/files/' + fileId);
-        xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-        xhr.send();
+        var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
+        exports.delete(url).then(callback);
     };
-    var onGetTokenStringSuccess = function() {
+    identity.getTokenString().then(function() {
         // Get the file id and pass it on.
         var appIdIndex = entry.fullPath.indexOf(chrome.runtime.id);
 
@@ -401,9 +386,11 @@ function remove(entry, callback) {
         } else {
             idm.getDirectoryId(relativePath, _syncableAppDirectoryId, false /* shouldCreateDirectory */, onGetIdSuccess);
         }
-    };
-
-    identity.getTokenString(onGetTokenStringSuccess);
+    })
+    .catch(function(e) {
+        console.log(e.stack);
+        errorCallback(e); 
+    });
 }
 
 // This function creates the app's syncable directory on Drive.
@@ -568,28 +555,31 @@ function deleteFile(fileName, callback) {
 // This function downloads the given Drive file.
 function downloadFile(file, callback) {
     // Send a request to retrieve the changes.
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function() {
-        if (xhr.readyState === 4) {
-            if (xhr.status === 200) {
-                var onSaveDataSuccess = function(fileEntry) {
-                    console.log('Download of ' + file.title + ' complete!');
-                    callback(fileEntry);
-                }
-                saveData(file.title, xhr.responseText, onSaveDataSuccess);
-            } else {
-                console.log('Download failed with status ' + xhr.status + '.');
-            }
+    exports.get(file.downloadUrl).then(
+        function(fileEntry) {
+            return saveData(file.title, xhr.responseText);
+        },
+        function(e) {
+            console.log('Get download failed with status ' + e + '.');
         }
-    };
-
-    xhr.open('GET', file.downloadUrl);
-    xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-    xhr.send();
+    )
+    .then(
+        function(fileEntry) {
+            console.log('Download of ' + file.title + ' complete!');
+            callback(fileEntry);
+        },
+        function(e) {
+            console.log('Download failed with status ' + e + '.');
+        }
+    );
 }
 
 // This function saves the supplied data to a file at the given file name.
 function saveData(fileName, data, callback) {
+    if (!successCallback) {
+        return new Promise(saveData);
+    }
+
     var onGetFileSuccess = function(fileEntry) {
         var onCreateWriterSuccess = function(fileWriter) {
             // TODO: need to truncate first

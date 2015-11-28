@@ -30,41 +30,7 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
             console.log('getDriveFileId Error: ' + e);
         };
     }
-/*
-    identity.getTokenString().then(
-        function() {
-            // Send a request to locate the directory.
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === 4) {
-                    if (xhr.status === 200) {
-                        console.log('Successfully searched for file using query: ' + query + '.');
-                        var items = JSON.parse(xhr.responseText).items;
-                        if (items.length === 0) {
-                            console.log('  File not found.');
-                            successCallback(null);
-                            // errorCallback(C.FILE_NOT_FOUND_ERROR);
-                        } else if (items.length == 1) {
-                            console.log('  File found with id: ' + items[0].id + '.');
-                            successCallback(items[0]);
-                        } else {
-                            console.log('  Multiple (' + items.length + ') copies found.');
-                            errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
-                        }
-                    } else {
-                        console.log('  Search failed with status ' + xhr.status + '.');
-                        errorCallback(C.REQUEST_FAILED_ERROR);
-                    }
-                }
-            };
 
-            xhr.open('GET', 'https://www.googleapis.com/drive/v2/files?q=' + query);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-            xhr.send();
-        }, 
-        errorCallback
-    ); */
     identity.getTokenString().then(function() {
         return xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query);
         }, 
