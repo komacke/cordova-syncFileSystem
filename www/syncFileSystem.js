@@ -210,7 +210,7 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
         // Get the app directory id.
         idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
     };
-    identity.getTokenString.then(
+    identity.getTokenString().then(
         function() {
         // Get the Drive "Chrome Syncable FileSystem" directory id.
             idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
@@ -221,7 +221,7 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
 
 // This function syncs an entry to Drive, creating it if necessary.
 function sync(entry, callback) {
-    identity.getTokenString.then(
+    identity.getTokenString().then(
         function() {
             // Drive, unfortunately, does not allow searching by path.
             // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
