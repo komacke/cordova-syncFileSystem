@@ -6,6 +6,7 @@ var exec = cordova.require('cordova/exec');
 var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 var idm = cordova.require('com.komacke.chromium.syncfilesystem.IdManagement');
 var C = cordova.require('com.komacke.chromium.syncfilesystem.Constants');
+var xhr = cordova.require('com.komacke.chromium.syncfilesystem.Xhr');
 
 //=======
 // Drive
