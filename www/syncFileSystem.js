@@ -555,7 +555,7 @@ function deleteFile(fileName, callback) {
 // This function downloads the given Drive file.
 function downloadFile(file, callback) {
     // Send a request to retrieve the changes.
-    exports.get(file.downloadUrl).then(
+    xhr.get(file.downloadUrl).then(
         function(fileEntry) {
             return saveData(file.title, xhr.responseText);
         },
