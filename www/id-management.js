@@ -65,7 +65,7 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
         }, 
         errorCallback
     ); */
-    identity.getTokenString().then(function() {
+    identity.getTokenString.then(function() {
         return xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query);
         }, 
         errorCallback
