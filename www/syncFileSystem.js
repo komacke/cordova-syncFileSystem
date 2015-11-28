@@ -577,7 +577,7 @@ function downloadFile(file, callback) {
 
 // This function saves the supplied data to a file at the given file name.
 function saveData(fileName, data, callback) {
-    if (!successCallback) {
+    if (!callback) {
         return new Promise(saveData);
     }
 
