@@ -51,5 +51,5 @@ exports.get = function(url, contentType) {
 }
 
 exports.getJSON = function(url) {
-    return get(url, 'application/json');
+    return exports.get(url, 'application/json');
 }
