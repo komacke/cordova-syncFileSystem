@@ -202,18 +202,19 @@ window.resolveLocalFileSystemURL = function(url, successCallback, errorCallback)
 
 // This function creates an app-specific directory on the user's Drive.
 function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallback) {
-    var onGetSyncableAppDirectoryIdSuccess = function(syncableAppDirectoryId) {
-        // Keep that directory id!  We'll need it.
-        _syncableAppDirectoryId = syncableAppDirectoryId;
-        successCallback(directoryEntry);
-    };
-    var onGetSyncableRootDirectoryIdSuccess = function(syncableRootDirectoryId) {
-        // Get the app directory id.
-        idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
-    };
-    identity.getTokenString().then(
+    identity.getTokenString()
+    .then(
         function() {
-        // Get the Drive "Chrome Syncable FileSystem" directory id.
+            var onGetSyncableAppDirectoryIdSuccess = function(syncableAppDirectoryId) {
+                // Keep that directory id!  We'll need it.
+                _syncableAppDirectoryId = syncableAppDirectoryId;
+                successCallback(directoryEntry);
+            };
+            var onGetSyncableRootDirectoryIdSuccess = function(syncableRootDirectoryId) {
+                // Get the app directory id.
+                idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
+            };
+            // Get the Drive "Chrome Syncable FileSystem" directory id.
             idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
         }
     );
@@ -221,7 +222,8 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
 
 // This function syncs an entry to Drive, creating it if necessary.
 function sync(entry, callback) {
-    identity.getTokenString().then(
+    identity.getTokenString()
+    .then(
         function() {
             // Drive, unfortunately, does not allow searching by path.
             // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
@@ -363,69 +365,77 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                 idm.getDriveFileId(query, onGetDriveFileIdSuccess, function(e) {console.log("getDriveFileId error: "+e);});
             // Get the file id and pass it on.
         }
+    ).catch(
+        function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
+        }
     );
 }
 
 // This function removes a file or directory from Drive.
 function remove(entry, callback) {
-    var onGetIdSuccess = function(fileIdInfo) {
-        var fileId = fileIdInfo[driveId];
-        var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
-        exports.delete(url).then(callback);
-    };
-    identity.getTokenString().then(function() {
-        // Get the file id and pass it on.
-        var appIdIndex = entry.fullPath.indexOf(chrome.runtime.id);
+    identity.getTokenString()
+    .then(
+        function() {
+            var onGetIdSuccess = function(fileIdInfo) {
+                var fileId = fileIdInfo[driveId];
+                var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
+                exports.delete(url).then(callback);
+            };
 
-        // If the app id isn't in the path, we can't remove it.
-        if (appIdIndex < 0) {
-            console.log("Entry cannot be removed because it is not a descendant of the app directory.");
-            return;
-        }
+            // Get the file id and pass it on.
+            var appIdIndex = entry.fullPath.indexOf(chrome.runtime.id);
 
-        var relativePath = entry.fullPath.substring(appIdIndex + chrome.runtime.id.length + 1);
-        if (entry.isFile) {
-            idm.getFileId(relativePath, _syncableAppDirectoryId, onGetIdSuccess);
-        } else {
-            idm.getDirectoryId(relativePath, _syncableAppDirectoryId, false /* shouldCreateDirectory */, onGetIdSuccess);
+            // If the app id isn't in the path, we can't remove it.
+            if (appIdIndex < 0) {
+                console.log("Entry cannot be removed because it is not a descendant of the app directory.");
+                return;
+            }
+
+            var relativePath = entry.fullPath.substring(appIdIndex + chrome.runtime.id.length + 1);
+            if (entry.isFile) {
+                idm.getFileId(relativePath, _syncableAppDirectoryId, onGetIdSuccess);
+            } else {
+                idm.getDirectoryId(relativePath, _syncableAppDirectoryId, false /* shouldCreateDirectory */, onGetIdSuccess);
+            }
         }
-    })
-    .catch(function(e) {
-        console.log(e.stack);
-        errorCallback(e); 
-    });
+    )
+    .catch(
+        function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
+        }
+    );
 }
 
 // This function creates the app's syncable directory on Drive.
 function createDirectory(directoryName, parentDirectoryId, callback) {
-    var onGetTokenStringSuccess = function() {
-        // Create the data to send.
-        var data = { title: directoryName,
-                     mimeType: 'application/vnd.google-apps.folder' };
-        if (parentDirectoryId) {
-            data.parents = [{ id: parentDirectoryId }];
-        }
-
-        // Send a request to upload the file.
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    console.log('Directory created!');
-                    callback(JSON.parse(xhr.responseText).id);
-                } else {
-                    console.log('Failed to create directory with status ' + xhr.status + '.');
-                }
+    identity.getTokenString()
+    .then(
+        function() {
+            // Create the data to send.
+            var data = { title: directoryName,
+                         mimeType: 'application/vnd.google-apps.folder' };
+            if (parentDirectoryId) {
+                data.parents = [{ id: parentDirectoryId }];
             }
-        };
 
-        xhr.open('POST', 'https://www.googleapis.com/drive/v2/files');
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-        xhr.send(JSON.stringify(data));
-    };
-
-    identity.getTokenString(onGetTokenStringSuccess);
+            return xhr.postJSON('https://www.googleapis.com/drive/v2/files', JSON.stringify(data));
+        }
+    ).then(
+        function(responseText) {
+            callback(responseText.id);
+        },
+        function(xhr) {
+            console.log('Failed to create directory with status ' + xhr.status + '.');
+        }
+    ).catch(
+        function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
+        }
+    );
 }
 
 //--------------------
@@ -536,23 +546,30 @@ function getDriveChanges(successCallback, errorCallback) {
 
 // This function deletes a file locally.
 function deleteFile(fileName, callback) {
-    var onGetFileSuccess = function(fileEntry) {
-        var onRemoveSuccess = function() {
-            console.log('Successfully removed file ' + fileName + '.');
-            callback(fileEntry);
+    deleteFilePromise = function(callback) {
+        var onGetFileSuccess = function(fileEntry) {
+            var onRemoveSuccess = function() {
+                console.log('Successfully removed file ' + fileName + '.');
+                callback(fileEntry);
+            };
+            var onRemoveError = function(e) {
+                console.log('Failed to remove file ' + fileName + '.');
+            };
+            fileEntry.remove(onRemoveSuccess, onRemoveError);
         };
-        var onRemoveError = function(e) {
-            console.log('Failed to remove file ' + fileName + '.');
+        var onGetFileError = function(e) {
+            console.log('Failed to get file.');
         };
-        fileEntry.remove(onRemoveSuccess, onRemoveError);
-    };
-    var onGetFileError = function(e) {
-        console.log('Failed to get file.');
-    };
 
-    var getFileFlags = { create: true, exclusive: false };
-    localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+        var getFileFlags = { create: true, exclusive: false };
+        localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+        //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+    }
+    if (!callback) {
+        return new Promise(deleteFilePromise);
+    } else {
+        deleteFilePromise(callback);
+    }
 }
 
 // This function downloads the given Drive file.
@@ -573,6 +590,11 @@ function downloadFile(file, callback) {
         },
         function(e) {
             console.log('Download failed with status ' + e + '.');
+        }
+    ).catch(
+        function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
         }
     );
 }

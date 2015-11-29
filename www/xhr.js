@@ -22,7 +22,7 @@ exports.delete = function(url) {
     });
 }
 
-exports.get = function(url, contentType) {
+exports.request = function(method, url, contentType, data) {
     return new Promise(function(successCallback, errorCallback) {
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -37,19 +37,25 @@ exports.get = function(url, contentType) {
                             break;      
                     }
                 } else {
-                    errorCallback(xhr.status);
+                    console.log('Failed to remove entry with status ' + xhr.status + '.');
+                    if (errorCallback) 
+                        errorCallback(xhr);
                 }
             }
         };
 
-        xhr.open('GET', url);
+        xhr.open(method, url);
         if (contentType)
             xhr.setRequestHeader('Content-Type', contentType);
         xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-        xhr.send();
+        xhr.send(data);
     });
 }
 
 exports.getJSON = function(url) {
-    return exports.get(url, 'application/json');
+    return exports.request('GET', url, 'application/json', null);
+}
+
+exports.postJSON = function(url, data) {
+    return exports.request('POST', url, 'application/json', data);
 }
