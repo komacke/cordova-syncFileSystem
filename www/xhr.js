@@ -52,6 +52,10 @@ exports.request = function(method, url, contentType, data) {
     });
 }
 
+exports.get = function(url) {
+    return exports.request('GET', url);
+}
+
 exports.getJSON = function(url) {
     return exports.request('GET', url, 'application/json', null);
 }
