@@ -426,6 +426,16 @@ function createDirectory(directoryName, parentDirectoryId, callback) {
 // errorCallback: function()
 function getDriveChanges(successCallback, errorCallback) {
     var NEXT_CHANGE_ID_KEY = C.SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-next_change_id';
+
+    new Promise(
+        function(resolve, reject) { 
+            chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, resolve); 
+        }
+    ).then(
+        return identity.getTokenString()
+    ).then(
+        function(items) {
+
         // Send a request to retrieve the changes.
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -504,8 +514,6 @@ function getDriveChanges(successCallback, errorCallback) {
             }
         };
 
-        // Retrieve the next change id to use as a starting point.
-        var getCallback = function(items) {
             var nextChangeId = 1;
             if (items[NEXT_CHANGE_ID_KEY]) {
                 nextChangeId = items[NEXT_CHANGE_ID_KEY];
@@ -515,8 +523,13 @@ function getDriveChanges(successCallback, errorCallback) {
             xhr.open('GET', 'https://www.googleapis.com/drive/v2/changes?startChangeId=' + nextChangeId + '&includeDeleted=true&includeSubscribed=true&maxResults=1000');
             xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
             xhr.send();
-        };
-        chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, getCallback);
+        }
+    ).catch(
+        function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
+        }
+    );
 }
 
 // This function deletes a file locally.
