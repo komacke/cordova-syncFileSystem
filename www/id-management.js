@@ -111,6 +111,7 @@ exports.getDirectoryId = function(directoryName, parentDirectoryId, shouldCreate
 
 // This function retrieves the Drive file id of the given file, if it exists.  Otherwise, it yields null.
 exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
+  getFileIdPromise = function(successCallback) {
     var fileIdKey = constructFileIdKey(fileName);
     var getCallback = function(items) {
         if (items[fileIdKey]) {
@@ -163,6 +164,12 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
     };
 
     chrome.storage.internal.get(fileIdKey, getCallback);
+  }
+    if (!successCallback) {
+        return new Promise(getFileIdPromise);
+    } else {
+        getFileIdPromise(successCallback);
+    }
 }
 
 // This function retrieves the local file status, if it exists.  Otherwise, it yields null.
