@@ -433,11 +433,6 @@ function getDriveChanges(successCallback, errorCallback) {
         }
     ).then(
         function(items) {
-            return identity.getTokenString();
-            return items;
-        }
-    ).then(
-        function(items) {
 
             var nextChangeId = 1;
             if (items[NEXT_CHANGE_ID_KEY])
