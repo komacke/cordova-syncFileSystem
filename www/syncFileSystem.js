@@ -432,7 +432,9 @@ function getDriveChanges(successCallback, errorCallback) {
             chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, resolve); 
         }
     ).then(
-        return identity.getTokenString()
+        function(resolve, reject) {
+            return identity.getTokenString();
+        }
     ).then(
         function(items) {
 
