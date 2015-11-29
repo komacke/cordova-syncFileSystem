@@ -53,7 +53,7 @@ exports.request = function(method, url, contentType, data) {
                 xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
                 xhr.send(data);
             }
-        }
+        )}
     ).catch(
         function(e) {
             console.log(e.stack);
