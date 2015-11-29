@@ -202,22 +202,17 @@ window.resolveLocalFileSystemURL = function(url, successCallback, errorCallback)
 
 // This function creates an app-specific directory on the user's Drive.
 function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallback) {
-    identity.getTokenString()
-    .then(
-        function() {
-            var onGetSyncableAppDirectoryIdSuccess = function(syncableAppDirectoryId) {
-                // Keep that directory id!  We'll need it.
-                _syncableAppDirectoryId = syncableAppDirectoryId;
-                successCallback(directoryEntry);
-            };
-            var onGetSyncableRootDirectoryIdSuccess = function(syncableRootDirectoryId) {
-                // Get the app directory id.
-                idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
-            };
-            // Get the Drive "Chrome Syncable FileSystem" directory id.
-            idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
-        }
-    );
+    var onGetSyncableAppDirectoryIdSuccess = function(syncableAppDirectoryId) {
+        // Keep that directory id!  We'll need it.
+        _syncableAppDirectoryId = syncableAppDirectoryId;
+        successCallback(directoryEntry);
+    };
+    var onGetSyncableRootDirectoryIdSuccess = function(syncableRootDirectoryId) {
+        // Get the app directory id.
+        idm.getDirectoryId(chrome.runtime.id /* directoryName */, syncableRootDirectoryId /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableAppDirectoryIdSuccess);
+    };
+    // Get the Drive "Chrome Syncable FileSystem" directory id.
+    idm.getDirectoryId('Chrome Syncable FileSystem', null /* parentDirectoryId */, true /* shouldCreateDirectory */, onGetSyncableRootDirectoryIdSuccess);
 }
 
 // This function syncs an entry to Drive, creating it if necessary.

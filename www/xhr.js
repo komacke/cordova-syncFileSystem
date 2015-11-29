@@ -1,7 +1,7 @@
 var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 
 exports.delete = function(url) {
-    identity.getTokenString()
+    return identity.getTokenString()
     .then(
         function() {
             return new Promise(function(successCallback, errorCallback) {
@@ -33,7 +33,7 @@ exports.delete = function(url) {
 }
 
 exports.request = function(method, url, contentType, data) {
-    identity.getTokenString()
+    return identity.getTokenString()
     .then(
         function() {
             return new Promise(function(successCallback, errorCallback) {
