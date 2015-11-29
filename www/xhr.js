@@ -23,33 +23,42 @@ exports.delete = function(url) {
 }
 
 exports.request = function(method, url, contentType, data) {
-    return new Promise(function(successCallback, errorCallback) {
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    switch (contentType) {
-                        case 'application/json':                        
-                            successCallback(JSON.parse(xhr.responseText));
-                            break;
-                        default:
-                            successCallback(xhr.responseText);
-                            break;      
+    identity.getTokenString()
+    .then(
+        function() {
+            return new Promise(function(successCallback, errorCallback) {
+                var xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            switch (contentType) {
+                                case 'application/json':                        
+                                    successCallback(JSON.parse(xhr.responseText));
+                                    break;
+                                default:
+                                    successCallback(xhr.responseText);
+                                    break;      
+                            }
+                        } else {
+                            console.log('Failed to remove entry with status ' + xhr.status + '.');
+                            if (errorCallback) 
+                                errorCallback(xhr);
+                        }
                     }
-                } else {
-                    console.log('Failed to remove entry with status ' + xhr.status + '.');
-                    if (errorCallback) 
-                        errorCallback(xhr);
-                }
-            }
-        };
+                };
 
-        xhr.open(method, url);
-        if (contentType)
-            xhr.setRequestHeader('Content-Type', contentType);
-        xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-        xhr.send(data);
-    });
+                xhr.open(method, url);
+                if (contentType)
+                    xhr.setRequestHeader('Content-Type', contentType);
+                xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
+                xhr.send(data);
+        }
+    ).catch(
+        function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
+        }
+    );
 }
 
 exports.get = function(url) {

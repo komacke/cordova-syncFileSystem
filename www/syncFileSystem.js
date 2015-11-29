@@ -577,6 +577,7 @@ function downloadFile(file, callback) {
     // Send a request to retrieve the changes.
     xhr.get(file.downloadUrl).then(
         function(fileEntry) {
+            console.log('Download of ' + file.title + ' complete!');
             return saveData(file.title, fileEntry);
         },
         function(e) {
@@ -585,11 +586,11 @@ function downloadFile(file, callback) {
     )
     .then(
         function(fileEntry) {
-            console.log('Download of ' + file.title + ' complete!');
+            console.log('Saved: ' + file.title + ' complete!');
             callback(fileEntry);
         },
         function(e) {
-            console.log('Download failed with status ' + e + '.');
+            console.log('Save failed with: ' + e + '.');
         }
     ).catch(
         function(e) {
