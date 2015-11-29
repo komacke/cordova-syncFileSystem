@@ -442,7 +442,6 @@ function getDriveChanges(successCallback, errorCallback) {
             xhr.getJSON('https://www.googleapis.com/drive/v2/changes?startChangeId=' + nextChangeId + '&includeDeleted=true&includeSubscribed=true&maxResults=1000')
             .then(
                 function(responseJson) {
-                    var responseJson = JSON.parse(xhr.responseText);
                     var numChanges = responseJson.items.length;
                     console.log('Successfully retrieved ' + numChanges + ' changes.');
 
@@ -511,7 +510,8 @@ function getDriveChanges(successCallback, errorCallback) {
                 },
                 errorCallback
             );
-        }
+        },
+        errorCallback
     ).catch(
         function(e) {
             console.log(e.stack);
