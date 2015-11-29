@@ -222,39 +222,34 @@ function createAppDirectoryOnDrive(directoryEntry, successCallback, errorCallbac
 
 // This function syncs an entry to Drive, creating it if necessary.
 function sync(entry, callback) {
-    identity.getTokenString()
-    .then(
-        function() {
-            // Drive, unfortunately, does not allow searching by path.
-            // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
-            var pathRemainder = entry.fullPath;
-            var appIdIndex = pathRemainder.indexOf(chrome.runtime.id);
+    // Drive, unfortunately, does not allow searching by path.
+    // Begin the process of drilling down to find the correct parent directory.  We can start with the app directory.
+    var pathRemainder = entry.fullPath;
+    var appIdIndex = pathRemainder.indexOf(chrome.runtime.id);
 
-            // If the app id isn't in the path, we can't sync it.
-            if (appIdIndex < 0) {
-                console.log("Entry cannot be synced because it is not a descendant of the app directory.");
-                return;
+    // If the app id isn't in the path, we can't sync it.
+    if (appIdIndex < 0) {
+        console.log("Entry cannot be synced because it is not a descendant of the app directory.");
+        return;
+    }
+
+    // Augment the callback to fire the status listener, but only if we've synced a file, not a directory.
+    var augmentedCallback = function(fileAction) {
+        if (entry.isFile) {
+            var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: fileAction, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
+            for (var i = 0; i < fileStatusListeners.length; i++) {
+                fileStatusListeners[i](fileInfo);
             }
-
-            // Augment the callback to fire the status listener, but only if we've synced a file, not a directory.
-            var augmentedCallback = function(fileAction) {
-                if (entry.isFile) {
-                    var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: fileAction, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
-                    for (var i = 0; i < fileStatusListeners.length; i++) {
-                        fileStatusListeners[i](fileInfo);
-                    }
-                }
-
-                if (callback) {
-                    callback();
-                }
-            };
-
-            // Using the remainder of the path, start the recursive process of drilling down.
-            pathRemainder = pathRemainder.substring(appIdIndex + chrome.runtime.id.length + 1);
-            syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);
         }
-    );
+
+        if (callback) {
+            callback();
+        }
+    };
+
+    // Using the remainder of the path, start the recursive process of drilling down.
+    pathRemainder = pathRemainder.substring(appIdIndex + chrome.runtime.id.length + 1);
+    syncAtPath(entry, _syncableAppDirectoryId, pathRemainder, augmentedCallback);
 }
 
 // This function syncs an entry to Drive, given its path, creating it if necessary.
@@ -289,13 +284,7 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
 // This function uploads a file to Drive.
 // TODO(maxw): Implement exponential backoff on 503 (and perhaps other?) responses.
 function uploadFile(fileEntry, parentDirectoryId, callback) {
-    identity.getTokenString()
-    .then(
-        function() {
-            return idm.getFileId(fileEntry.name, parentDirectoryId);
-        }
-    )
-    .then(
+    idm.getFileId(fileEntry.name, parentDirectoryId).then(
         function(fileIdInfo) {
                 var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
                 var onGetDriveFileIdSuccess = function(driveIdInfo) {
@@ -375,55 +364,39 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
 
 // This function removes a file or directory from Drive.
 function remove(entry, callback) {
-    identity.getTokenString()
-    .then(
-        function() {
-            var onGetIdSuccess = function(fileIdInfo) {
-                var fileId = fileIdInfo[driveId];
-                var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
-                exports.delete(url).then(callback);
-            };
+    var onGetIdSuccess = function(fileIdInfo) {
+        var fileId = fileIdInfo[driveId];
+        var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
+        exports.delete(url).then(callback);
+    };
 
-            // Get the file id and pass it on.
-            var appIdIndex = entry.fullPath.indexOf(chrome.runtime.id);
+    // Get the file id and pass it on.
+    var appIdIndex = entry.fullPath.indexOf(chrome.runtime.id);
 
-            // If the app id isn't in the path, we can't remove it.
-            if (appIdIndex < 0) {
-                console.log("Entry cannot be removed because it is not a descendant of the app directory.");
-                return;
-            }
+    // If the app id isn't in the path, we can't remove it.
+    if (appIdIndex < 0) {
+        console.log("Entry cannot be removed because it is not a descendant of the app directory.");
+        return;
+    }
 
-            var relativePath = entry.fullPath.substring(appIdIndex + chrome.runtime.id.length + 1);
-            if (entry.isFile) {
-                idm.getFileId(relativePath, _syncableAppDirectoryId, onGetIdSuccess);
-            } else {
-                idm.getDirectoryId(relativePath, _syncableAppDirectoryId, false /* shouldCreateDirectory */, onGetIdSuccess);
-            }
-        }
-    )
-    .catch(
-        function(e) {
-            console.log(e.stack);
-            errorCallback(e); 
-        }
-    );
+    var relativePath = entry.fullPath.substring(appIdIndex + chrome.runtime.id.length + 1);
+    if (entry.isFile) {
+        idm.getFileId(relativePath, _syncableAppDirectoryId, onGetIdSuccess);
+    } else {
+        idm.getDirectoryId(relativePath, _syncableAppDirectoryId, false /* shouldCreateDirectory */, onGetIdSuccess);
+    }
 }
 
 // This function creates the app's syncable directory on Drive.
 function createDirectory(directoryName, parentDirectoryId, callback) {
-    identity.getTokenString()
-    .then(
-        function() {
-            // Create the data to send.
-            var data = { title: directoryName,
-                         mimeType: 'application/vnd.google-apps.folder' };
-            if (parentDirectoryId) {
-                data.parents = [{ id: parentDirectoryId }];
-            }
+    // Create the data to send.
+    var data = { title: directoryName,
+                 mimeType: 'application/vnd.google-apps.folder' };
+    if (parentDirectoryId) {
+        data.parents = [{ id: parentDirectoryId }];
+    }
 
-            return xhr.postJSON('https://www.googleapis.com/drive/v2/files', JSON.stringify(data));
-        }
-    ).then(
+    xhr.postJSON('https://www.googleapis.com/drive/v2/files', JSON.stringify(data)).then(
         function(responseText) {
             callback(responseText.id);
         },
@@ -447,7 +420,6 @@ function createDirectory(directoryName, parentDirectoryId, callback) {
 // errorCallback: function()
 function getDriveChanges(successCallback, errorCallback) {
     var NEXT_CHANGE_ID_KEY = C.SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-next_change_id';
-    var onGetTokenStringSuccess = function() {
         // Send a request to retrieve the changes.
         var xhr = new XMLHttpRequest();
         xhr.onreadystatechange = function() {
@@ -539,9 +511,6 @@ function getDriveChanges(successCallback, errorCallback) {
             xhr.send();
         };
         chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, getCallback);
-    };
-
-    identity.getTokenString(onGetTokenStringSuccess, errorCallback);
 }
 
 // This function deletes a file locally.

@@ -31,11 +31,7 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
         };
     }
 
-    identity.getTokenString().then(function() {
-        return xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query);
-        }, 
-        errorCallback
-    )
+    xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query)
     .then(function(json) {
         console.log('Successfully searched for file using query: ' + query + '.');
         var items = json.items;
