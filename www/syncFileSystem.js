@@ -281,74 +281,85 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
 function uploadFile(fileEntry, parentDirectoryId, callback) {
     idm.getFileId(fileEntry.name, parentDirectoryId).then(
         function(fileIdInfo) {
-                var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
-                var onGetDriveFileIdSuccess = function(driveIdInfo) {
-                    if (driveIdInfo && driveIdInfo.id == fileIdInfo.driveId) {
-                        console.log("File not uploaded because it's already there: ");
-                        console.log(fileIdInfo);
-                    } else {
-                        var onFileSuccess = function(file) {
-                            // Read the file and send its contents.
-                            var fileReader = new FileReader();
-                            fileReader.onload = function(evt) {
-                                // This is used to note whether a file was created or updated.
-                                var fileAction;
-
-                                // Create the data to send.
-                                var metadata = { title: fileEntry.name,
-                                                 parents: [{ id: parentDirectoryId }] };
-                                var boundary = '2718281828459045';
-                                var body = [];
-                                body.push('--' + boundary);
-                                body.push('Content-Type: application/json');
-                                body.push('');
-                                body.push(JSON.stringify(metadata));
-                                body.push('');
-                                body.push('--' + boundary);
-                                // TODO(maxw): Use the correct content type.
-                                body.push('Content-Type: text/plain');
-                                body.push('');
-                                body.push(fileReader.result);
-                                body.push('');
-                                body.push('--' + boundary + '--');
-                                var bodyString = body.join('\r\n');
-
-                                // Send a request to upload the file.
-                                var xhr = new XMLHttpRequest();
-                                xhr.onreadystatechange = function() {
-                                    if (xhr.readyState === 4) {
-                                        if (xhr.status === 200) {
-                                            console.log('File synced!');
-                                            callback(fileAction);
-                                        } else {
-                                            console.log('File failed to sync with status ' + xhr.status + '.');
-                                        }
-                                    }
-                                };
-
-                                // If there's a file id, update the file.  Otherwise, upload it anew.
-                                if (fileIdInfo) {
-                                    fileAction = C.SYNC_ACTION_UPDATED;
-                                    xhr.open('PUT', 'https://www.googleapis.com/upload/drive/v2/files/' + fileIdInfo[driveId] + '?uploadType=multipart');
-                                } else {
-                                    fileAction = C.SYNC_ACTION_ADDED;
-                                    xhr.open('POST', 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart');
-                                }
-                                xhr.setRequestHeader('Content-Type', 'multipart/related; boundary=' + boundary);
-                                //xhr.setRequestHeader('Content-Length', bodyString.length);
-                                xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-                                xhr.send(bodyString);
-                            };
-                            fileReader.readAsBinaryString(file);
-                        };
-
-                        // Get the file.
-                        fileEntry.file(onFileSuccess);
-                    }
-                };
-                idm.getDriveFileId(query, onGetDriveFileIdSuccess, function(e) {console.log("getDriveFileId error: "+e);});
-            // Get the file id and pass it on.
+            var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
+            return idm.getDriveFileId(query);
         }
+    ).then(
+        function(driveIdInfo) {
+            if (driveIdInfo && driveIdInfo.id == fileIdInfo.driveId) {
+                console.log("File not uploaded because it's already there: ");
+                console.log(fileIdInfo);
+            } else {
+                var onFileSuccess = function(file) {
+                    // Read the file and send its contents.
+                    var fileReader = new FileReader();
+                    fileReader.onload = function(evt) {
+                        // This is used to note whether a file was created or updated.
+                        var fileAction;
+
+                        // Create the data to send.
+                        var metadata = { title: fileEntry.name,
+                                         parents: [{ id: parentDirectoryId }] };
+                        var boundary = '2718281828459045';
+                        var body = [];
+                        body.push('--' + boundary);
+                        body.push('Content-Type: application/json');
+                        body.push('');
+                        body.push(JSON.stringify(metadata));
+                        body.push('');
+                        body.push('--' + boundary);
+                        // TODO(maxw): Use the correct content type.
+                        body.push('Content-Type: text/plain');
+                        body.push('');
+                        body.push(fileReader.result);
+                        body.push('');
+                        body.push('--' + boundary + '--');
+                        var bodyString = body.join('\r\n');
+
+                        // If there's a file id, update the file.  Otherwise, upload it anew.
+                        var method = '';
+                        var url = '';
+                        if (fileIdInfo) {
+                            fileAction = C.SYNC_ACTION_UPDATED;
+                            method = 'PUT';
+                            url = 'https://www.googleapis.com/upload/drive/v2/files/' + fileIdInfo[driveId] + '?uploadType=multipart';
+                        } else {
+                            fileAction = C.SYNC_ACTION_ADDED;
+                            method = 'POST';
+                            url = 'https://www.googleapis.com/upload/drive/v2/files?uploadType=multipart';
+                        }
+
+                        // Send a request to upload the file.
+                        xhr.request(
+                            method, 
+                            url,
+                            'multipart/related; boundary=' + boundary,
+                            bodyString
+                        ).then(
+                            function(fileAction) {
+                                console.log('File synced!');
+                                callback(fileAction);
+                            },
+                            function(xhr) {
+                                console.log('File failed to sync with status ' + xhr.status + '.');
+                            }
+                        )
+                        .catch(function(e) {
+                            console.log(e.stack);
+                            errorCallback(e); 
+                        });
+
+                    };
+                    fileReader.readAsBinaryString(file);
+                };
+
+                // Get the file.
+                fileEntry.file(onFileSuccess);
+            }
+        },
+        function(e) {
+            console.log("getDriveFileId error: "+e);
+        }    
     ).catch(
         function(e) {
             console.log(e.stack);
