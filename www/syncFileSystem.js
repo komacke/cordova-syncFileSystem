@@ -432,17 +432,21 @@ function getDriveChanges(successCallback, errorCallback) {
             chrome.storage.internal.get(NEXT_CHANGE_ID_KEY, resolve); 
         }
     ).then(
-        function(resolve, reject) {
+        function(items) {
             return identity.getTokenString();
+            return items;
         }
     ).then(
         function(items) {
 
-        // Send a request to retrieve the changes.
-        var xhr = new XMLHttpRequest();
-        xhr.onreadystatechange = function() {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
+            var nextChangeId = 1;
+            if (items[NEXT_CHANGE_ID_KEY])
+                nextChangeId = items[NEXT_CHANGE_ID_KEY];
+
+            // Send a request to retrieve the changes.
+            xhr.getJSON('https://www.googleapis.com/drive/v2/changes?startChangeId=' + nextChangeId + '&includeDeleted=true&includeSubscribed=true&maxResults=1000')
+            .then(
+                function(responseJson) {
                     var responseJson = JSON.parse(xhr.responseText);
                     var numChanges = responseJson.items.length;
                     console.log('Successfully retrieved ' + numChanges + ' changes.');
@@ -509,22 +513,9 @@ function getDriveChanges(successCallback, errorCallback) {
                         }
                     }
                     successCallback(numRelevantChanges);
-                } else {
-                    console.log('Change search failed with status ' + xhr.status + '.');
-                    errorCallback();
-                }
-            }
-        };
-
-            var nextChangeId = 1;
-            if (items[NEXT_CHANGE_ID_KEY]) {
-                nextChangeId = items[NEXT_CHANGE_ID_KEY];
-            }
-
-            // TODO(maxw): Use `nextLink` to get multiple pages of change results.
-            xhr.open('GET', 'https://www.googleapis.com/drive/v2/changes?startChangeId=' + nextChangeId + '&includeDeleted=true&includeSubscribed=true&maxResults=1000');
-            xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-            xhr.send();
+                },
+                errorCallback
+            );
         }
     ).catch(
         function(e) {
