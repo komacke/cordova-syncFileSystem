@@ -579,64 +579,68 @@ function downloadFile(file, callback) {
 
 // This function saves the supplied data to a file at the given file name.
 function saveData(fileName, data, callback) {
+    saveDataPromise = function(callback) {
+        var onGetFileSuccess = function(fileEntry) {
+            var onCreateWriterSuccess = function(fileWriter) {
+                // TODO: need to truncate first
+                fileWriter.write(data);
+                callback(fileEntry);
+            };
+            var onCreateWriterError = function(e) {
+                console.log('Failed to create writer.');
+            };
+            fileEntry.createWriter(onCreateWriterSuccess, onCreateWriterError);
+        };
+        var onGetFileError = function(e) {
+            console.log('Failed to get file: ' + fileName);
+            var msg = '';
+            switch ( e.code ) {
+                case FileError.ENCODING_ERR:
+                    msg = 'ENCODING_ERR';
+                    break;
+                case FileError.INVALID_MODIFICATION_ERR:
+                    msg = 'INVALID_MODIFICATION_ERR';
+                    break;
+                case FileError.INVALID_STATE_ERR:
+                    msg = 'INVALID_STATE_ERR';
+                    break;
+                case FileError.NO_MODIFICATION_ALLOWED_ERR:
+                    msg = 'NO_MODIFICATION_ALLOWED_ERR';
+                    break;
+                case FileError.NOT_FOUND_ERR:
+                    msg = 'NOT_FOUND_ERR';
+                    break;
+                case FileError.NOT_READABLE_ERR:
+                    msg = 'NOT_READABLE_ERR';
+                    break;
+                case FileError.PATH_EXISTS_ERR:
+                    msg = 'PATH_EXISTS_ERR';
+                    break;
+                case FileError.QUOTA_EXCEEDED_ERR:
+                    msg = 'QUOTA_EXCEEDED_ERR';
+                    break;
+                case FileError.SECURITY_ERR:
+                    msg = 'SECURITY_ERR';
+                    break;
+                case FileError.TYPE_MISMATCH_ERR:
+                    msg = 'TYPE_MISMATCH_ERR';
+                    break;
+                default:
+                    msg = 'Unknown Error';
+                    break;
+            };
+            console.log( 'Error: ' + msg );
+        };
+
+        var getFileFlags = { create: true, exclusive: false };
+        localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+    }
     if (!callback) {
-        return new Promise(saveData);
+        return new Promise(saveDataPromise);
+    } else {
+        saveDataPromise(callback);
     }
 
-    var onGetFileSuccess = function(fileEntry) {
-        var onCreateWriterSuccess = function(fileWriter) {
-            // TODO: need to truncate first
-            fileWriter.write(data);
-            callback(fileEntry);
-        };
-        var onCreateWriterError = function(e) {
-            console.log('Failed to create writer.');
-        };
-        fileEntry.createWriter(onCreateWriterSuccess, onCreateWriterError);
-    };
-    var onGetFileError = function(e) {
-        console.log('Failed to get file: ' + fileName);
-        var msg = '';
-        switch ( e.code ) {
-            case FileError.ENCODING_ERR:
-                msg = 'ENCODING_ERR';
-                break;
-            case FileError.INVALID_MODIFICATION_ERR:
-                msg = 'INVALID_MODIFICATION_ERR';
-                break;
-            case FileError.INVALID_STATE_ERR:
-                msg = 'INVALID_STATE_ERR';
-                break;
-            case FileError.NO_MODIFICATION_ALLOWED_ERR:
-                msg = 'NO_MODIFICATION_ALLOWED_ERR';
-                break;
-            case FileError.NOT_FOUND_ERR:
-                msg = 'NOT_FOUND_ERR';
-                break;
-            case FileError.NOT_READABLE_ERR:
-                msg = 'NOT_READABLE_ERR';
-                break;
-            case FileError.PATH_EXISTS_ERR:
-                msg = 'PATH_EXISTS_ERR';
-                break;
-            case FileError.QUOTA_EXCEEDED_ERR:
-                msg = 'QUOTA_EXCEEDED_ERR';
-                break;
-            case FileError.SECURITY_ERR:
-                msg = 'SECURITY_ERR';
-                break;
-            case FileError.TYPE_MISMATCH_ERR:
-                msg = 'TYPE_MISMATCH_ERR';
-                break;
-            default:
-                msg = 'Unknown Error';
-                break;
-        };
-        console.log( 'Error: ' + msg );
-    };
-
-    var getFileFlags = { create: true, exclusive: false };
-    localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
 }
 
 //=======================
