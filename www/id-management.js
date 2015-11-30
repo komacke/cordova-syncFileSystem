@@ -25,7 +25,7 @@ exports.getFileIdInfoForFileId = function(fileId, callback) {
 
 // This function gets the Drive file id using the given query.
 exports.getDriveFileId = function(query, successCallback, errorCallback) {
-    getFileIdPromise = function(successCallback) {
+    var getFileIdPromise = function(successCallback) {
         // If there's no error callback provided, make one.
         if (!errorCallback) {
             errorCallback = function(e) {
@@ -115,7 +115,7 @@ exports.getDirectoryId = function(directoryName, parentDirectoryId, shouldCreate
 
 // This function retrieves the Drive file id of the given file, if it exists.  Otherwise, it yields null.
 exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
-  getFileIdPromise = function(successCallback) {
+  var getFileIdPromise = function(successCallback) {
     var fileIdKey = constructFileIdKey(fileName);
     var getCallback = function(items) {
         if (items[fileIdKey]) {

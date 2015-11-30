@@ -529,7 +529,7 @@ function getDriveChanges(successCallback, errorCallback) {
 
 // This function deletes a file locally.
 deleteFile = function(fileIdInfo, callback) {
-    deleteFilePromise = function(callback) {
+    var deleteFilePromise = function(callback) {
         var onGetFileSuccess = function(fileEntry) {
             var onRemoveSuccess = function() {
                 console.log('Successfully removed file ' + fileIdinfo.fileName + '.');
@@ -585,7 +585,7 @@ function downloadFile(file, callback) {
 
 // This function saves the supplied data to a file at the given file name.
 function saveData(fileName, data, callback) {
-    saveDataPromise = function(callback) {
+    var saveDataPromise = function(callback) {
         var onGetFileSuccess = function(fileEntry) {
             var onCreateWriterSuccess = function(fileWriter) {
                 // TODO: need to truncate first
