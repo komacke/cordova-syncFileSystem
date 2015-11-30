@@ -546,7 +546,7 @@ function deleteFile(fileIdInfo) {
         var getFileFlags = { create: true, exclusive: false };
         localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
         //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    };
+    });
 }
 
 // This function downloads the given Drive file.
