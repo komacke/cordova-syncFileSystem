@@ -527,9 +527,8 @@ function getDriveChanges(successCallback, errorCallback) {
 }
 
 // This function deletes a file locally.
-function deleteFile(fileIdInfoInput) {
-    return new Promise(function(callback) {
-        var fileIdInfo = fileIdinfoInput;
+function deleteFile(fileIdInfo) {
+    return new Promise(function(fileIdInfo, callback) {
         var getFileFlags = { create: true, exclusive: false };
         DirectoryEntry.prototype.getFile.call(
             localDirectoryEntry, 
@@ -552,7 +551,7 @@ function deleteFile(fileIdInfoInput) {
         );
 
         //localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    });
+    }.bind(null, fileIdInfo));
 }
 
 // This function downloads the given Drive file.
