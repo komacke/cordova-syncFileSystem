@@ -279,8 +279,10 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
 // This function uploads a file to Drive.
 // TODO(maxw): Implement exponential backoff on 503 (and perhaps other?) responses.
 function uploadFile(fileEntry, parentDirectoryId, callback) {
+    var fileIdInfo;
     idm.getFileId(fileEntry.name, parentDirectoryId).then(
-        function(fileIdInfo) {
+        function(fileIdInfoLocal) {
+            fileIdInfo = fileIdInfoLocal;
             var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';
             return idm.getDriveFileId(query);
         }
@@ -439,7 +441,9 @@ function getDriveChanges(successCallback, errorCallback) {
                 nextChangeId = items[NEXT_CHANGE_ID_KEY];
 
             // Send a request to retrieve the changes.
-            xhr.getJSON('https://www.googleapis.com/drive/v2/changes?startChangeId=' + nextChangeId + '&includeDeleted=true&includeSubscribed=true&maxResults=1000')
+            xhr.getJSON('https://www.googleapis.com/drive/v2/changes?startChangeId=' 
+                + nextChangeId 
+                + '&includeDeleted=true&includeSubscribed=true&maxResults=1000')
             .then(
                 function(responseJson) {
                     var numChanges = responseJson.items.length;
