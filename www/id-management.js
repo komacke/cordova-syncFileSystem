@@ -11,7 +11,7 @@ exports.getFileNameForFileId = function(fileId, callback) {
     var getCallback = function(items) {
         for (var item in items) {
             if (items.hasOwnProperty(item)) {
-                if (items[item] === fileId) {
+                if (items[item].driveId === fileId) {
                     callback(extractFileName(item));
                     return;
                 }

@@ -66,7 +66,7 @@ function enableSyncabilityForEntry(entry) {
         };
 
         // Call the original function.  The augmented success callback will take care of the syncability addition work.
-        Entry.prototype.remove.call(entry, augmentedSuccessCallback, errorCallback);
+        FileEntry.prototype.remove.call(entry, augmentedSuccessCallback, errorCallback);
     };
 }
 
