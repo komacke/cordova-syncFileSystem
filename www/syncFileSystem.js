@@ -470,7 +470,7 @@ function getDriveChanges(successCallback, errorCallback) {
                                     // TODO(maxw): Deal with the fact that this is incremented asynchronously (ie. too late) and so isn't mattering.
                                     numRelevantChanges++;
                                     console.log('Deleting ' + fileIdInfo.fileName + '.');
-                                    var onDeleteFileSuccess = function(fileEntry) {
+                                    deleteFile(fileIdInfo).then(function(fileEntry) {
                                         // Inform the listeners.
                                         var fileInfo = { fileEntry: fileEntry, status: C.FILE_STATUS_SYNCED, action: C.SYNC_ACTION_DELETED, direction: C.SYNC_DIRECTION_REMOTE_TO_LOCAL };
                                         for (var i = 0; i < fileStatusListeners.length; i++) {
@@ -479,8 +479,7 @@ function getDriveChanges(successCallback, errorCallback) {
 
                                         // Remove the file id from the cache.
                                         idm.removeDriveIdFromCache(fileIdInfo.fileName, null);
-                                    };
-                                    deleteFile(fileIdInfo, onDeleteFileSuccess);
+                                    });
                                 }
                             };
                             idm.getFileIdInfoForFileId(change.fileId, onGetFileNameForFileIdSuccess);
@@ -528,8 +527,8 @@ function getDriveChanges(successCallback, errorCallback) {
 }
 
 // This function deletes a file locally.
-deleteFile = function(fileIdInfo, callback) {
-    var deleteFilePromise = function(callback) {
+function deleteFile(fileIdInfo) {
+    return new Promise(function(callback) {
         var onGetFileSuccess = function(fileEntry) {
             var onRemoveSuccess = function() {
                 console.log('Successfully removed file ' + fileIdinfo.fileName + '.');
@@ -547,12 +546,7 @@ deleteFile = function(fileIdInfo, callback) {
         var getFileFlags = { create: true, exclusive: false };
         localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
         //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-    }
-    if (!callback) {
-        return new Promise(deleteFilePromise);
-    } else {
-        deleteFilePromise(callback);
-    }
+    };
 }
 
 // This function downloads the given Drive file.
