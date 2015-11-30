@@ -527,25 +527,31 @@ function getDriveChanges(successCallback, errorCallback) {
 }
 
 // This function deletes a file locally.
-function deleteFile(fileIdInfo) {
+function deleteFile(fileIdInfoInput) {
     return new Promise(function(callback) {
-        var onGetFileSuccess = function(fileEntry) {
-            var onRemoveSuccess = function() {
-                console.log('Successfully removed file ' + fileIdinfo.fileName + '.');
-                callback(fileEntry);
-            };
-            var onRemoveError = function(e) {
-                console.log('Failed to remove file ' + fileIdinfo.fileName + '.');
-            };
-            fileEntry.remove(onRemoveSuccess, onRemoveError);
-        };
-        var onGetFileError = function(e) {
-            console.log('Failed to get file.');
-        };
-
+        var fileIdInfo = fileIdinfoInput;
         var getFileFlags = { create: true, exclusive: false };
-        localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-        //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+        DirectoryEntry.prototype.getFile.call(
+            localDirectoryEntry, 
+            fileIdinfo.fileName, 
+            getFileFlags, 
+            function(fileEntry) {
+                fileEntry.remove(
+                    function() {
+                        console.log('Successfully removed file ' + fileIdinfo.fileName + '.');
+                        callback(fileEntry);
+                    },
+                    function(e) {
+                        console.log('Failed to remove file ' + fileIdinfo.fileName + '.');
+                    }
+                );
+            },
+            function(e) {
+                console.log('Failed to get file.');
+            }
+        );
+
+        //localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
     });
 }
 
