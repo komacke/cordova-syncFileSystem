@@ -61,7 +61,13 @@ exports.request = function(method, url, contentType, data) {
                 if (contentType)
                     xhr.setRequestHeader('Content-Type', contentType);
                 xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-                xhr.send(data);
+                try {
+                    xhr.send(data);
+                } catch(e) {
+                    console.log("couldn't send xhr: " + e);
+                    if (errorCallback) 
+                       errorCallback(e);
+                }
             }
         );}
     ).catch(
