@@ -280,7 +280,8 @@ function syncAtPath(entry, currentDirectoryId, pathRemainder, callback) {
 // TODO(maxw): Implement exponential backoff on 503 (and perhaps other?) responses.
 function uploadFile(fileEntry, parentDirectoryId, callback) {
     var fileIdInfo;
-    idm.getFileId(fileEntry.name, parentDirectoryId).then(
+    idm.getFileId(fileEntry.name, parentDirectoryId)
+    .then(
         function(fileIdInfoLocal) {
             fileIdInfo = fileIdInfoLocal;
             var query = 'title = "' + fileEntry.name + '" and "' + parentDirectoryId + '" in parents and trashed = false';

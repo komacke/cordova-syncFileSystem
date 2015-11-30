@@ -24,33 +24,40 @@ exports.getFileNameForFileId = function(fileId, callback) {
 
 // This function gets the Drive file id using the given query.
 exports.getDriveFileId = function(query, successCallback, errorCallback) {
-    // If there's no error callback provided, make one.
-    if (!errorCallback) {
-        errorCallback = function(e) {
-            console.log('getDriveFileId Error: ' + e);
-        };
-    }
-
-    xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query)
-    .then(function(json) {
-        console.log('Successfully searched for file using query: ' + query + '.');
-        var items = json.items;
-        if (items.length === 0) {
-            console.log('  File not found.');
-            successCallback(null);
-            // errorCallback(C.FILE_NOT_FOUND_ERROR);
-        } else if (items.length == 1) {
-            console.log('  File found with id: ' + items[0].id + '.');
-            successCallback(items[0]);
-        } else {
-            console.log('  Multiple (' + items.length + ') copies found.');
-            errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
+    getFileIdPromise = function(successCallback) {
+        // If there's no error callback provided, make one.
+        if (!errorCallback) {
+            errorCallback = function(e) {
+                console.log('getDriveFileId Error: ' + e);
+            };
         }
-    })
-    .catch(function(e) {
-        console.log(e.stack);
-        errorCallback(e); 
-    });
+
+        xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query)
+        .then(function(json) {
+            console.log('Successfully searched for file using query: ' + query + '.');
+            var items = json.items;
+            if (items.length === 0) {
+                console.log('  File not found.');
+                successCallback(null);
+                // errorCallback(C.FILE_NOT_FOUND_ERROR);
+            } else if (items.length == 1) {
+                console.log('  File found with id: ' + items[0].id + '.');
+                successCallback(items[0]);
+            } else {
+                console.log('  Multiple (' + items.length + ') copies found.');
+                errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
+            }
+        })
+        .catch(function(e) {
+            console.log(e.stack);
+            errorCallback(e); 
+        });
+    }
+    if (!successCallback) {
+        return new Promise(getFileIdPromise);
+    } else {
+        getFileIdPromise(successCallback);
+    }
 
 }
 
