@@ -528,7 +528,7 @@ function getDriveChanges(successCallback, errorCallback) {
 }
 
 // This function deletes a file locally.
-function deleteFile(fileIdInfo, callback) {
+deleteFile = function(fileIdInfo, callback) {
     deleteFilePromise = function(callback) {
         var onGetFileSuccess = function(fileEntry) {
             var onRemoveSuccess = function() {
