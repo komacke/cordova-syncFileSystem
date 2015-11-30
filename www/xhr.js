@@ -50,7 +50,7 @@ exports.request = function(method, url, contentType, data) {
                                     break;      
                             }
                         } else {
-                            console.log('Failed to remove entry with status ' + xhr.status + '.');
+                            console.log('Failed with status ' + xhr.status + '.');
                             if (errorCallback) 
                                 errorCallback(xhr);
                         }
@@ -61,13 +61,7 @@ exports.request = function(method, url, contentType, data) {
                 if (contentType)
                     xhr.setRequestHeader('Content-Type', contentType);
                 xhr.setRequestHeader('Authorization', 'Bearer ' + identity.tokenString);
-                try {
-                    xhr.send(data);
-                } catch(e) {
-                    console.log("couldn't send xhr: " + e);
-                    if (errorCallback) 
-                       errorCallback(e);
-                }
+                xhr.send(data);
             }
         );}
     ).catch(
