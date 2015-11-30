@@ -532,22 +532,22 @@ function deleteFile(fileIdInfo) {
         var getFileFlags = { create: true, exclusive: false };
         DirectoryEntry.prototype.getFile.call(
             localDirectoryEntry, 
-            fileIdinfo.fileName, 
+            fileIdInfo.fileName, 
             getFileFlags, 
-            function(fileEntry) {
+            function(fileIdInfo, fileEntry) {
                 fileEntry.remove(
-                    function() {
-                        console.log('Successfully removed file ' + fileIdinfo.fileName + '.');
+                    function(fileIdInfo) {
+                        console.log('Successfully removed file ' + fileIdInfo.fileName + '.');
                         callback(fileEntry);
-                    },
-                    function(e) {
-                        console.log('Failed to remove file ' + fileIdinfo.fileName + '.');
-                    }
+                    }.bind(null, fileIdInfo),
+                    function(fileIdInfo, e) {
+                        console.log('Failed to remove file ' + fileIdInfo.fileName + '.');
+                    }.bind(null, fileIdInfo)
                 );
-            },
+            }.bind(null, fileIdInfo),
             function(e) {
-                console.log('Failed to get file.');
-            }
+                console.log('Failed to get file: ' + fileIdInfo.fileName);
+            }.bind(null, fileIdInfo)
         );
 
         //localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
