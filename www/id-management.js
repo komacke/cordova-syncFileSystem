@@ -7,12 +7,13 @@ var identity = cordova.require('com.komacke.chromium.syncfilesystem.Identity');
 var xhr = cordova.require('com.komacke.chromium.syncfilesystem.Xhr');
 
 // This function retrieves the file name for the given file id from local storage.
-exports.getFileNameForFileId = function(fileId, callback) {
+exports.getFileIdInfoForFileId = function(fileId, callback) {
     var getCallback = function(items) {
+        // TODO: use array.filter
         for (var item in items) {
             if (items.hasOwnProperty(item)) {
                 if (items[item].driveId === fileId) {
-                    callback(extractFileName(item));
+                    callback(items[item]);
                     return;
                 }
             }
@@ -195,11 +196,6 @@ exports.getFileSyncStatus = function(fileName, successCallback) {
 // This function returns a key to use for file id caching.
 constructFileIdKey = function(entryName) {
     return C.SYNC_FILE_SYSTEM_PREFIX + '-' + chrome.runtime.id + '-' + entryName;
-}
-
-// This function returns the file name associated with the given cached file id key.
-extractFileName = function(key) {
-    return key.substring(key.indexOf(chrome.runtime.id) + chrome.runtime.id.length + 1);
 }
 
 // This function caches the given Drive id.

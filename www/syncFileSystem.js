@@ -374,9 +374,11 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
 // This function removes a file or directory from Drive.
 function remove(entry, callback) {
     var onGetIdSuccess = function(fileIdInfo) {
-        var fileId = fileIdInfo[driveId];
-        var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
-        exports.delete(url).then(callback);
+        if (fileIdInfo.syncStatus == C.FILE_STATUS_SYNCED) {
+            var fileId = fileIdInfo.driveId;
+            var url = 'https://www.googleapis.com/drive/v2/files/' + fileId;
+            xhr.delete(url).then(callback);
+        }
     };
 
     // Get the file id and pass it on.
@@ -463,11 +465,11 @@ function getDriveChanges(successCallback, errorCallback) {
                     for (var i = 0; i < numChanges; i++) {
                         var change = responseJson.items[i];
                         if (change.deleted || change.file.explicitlyTrashed) {
-                            var onGetFileNameForFileIdSuccess = function(fileName) {
-                                if (fileName) {
+                            var onGetFileNameForFileIdSuccess = function(fileIdInfo) {
+                                if (fileIdInfo) {
                                     // TODO(maxw): Deal with the fact that this is incremented asynchronously (ie. too late) and so isn't mattering.
                                     numRelevantChanges++;
-                                    console.log('Deleting ' + fileName + '.');
+                                    console.log('Deleting ' + fileIdInfo.fileName + '.');
                                     var onDeleteFileSuccess = function(fileEntry) {
                                         // Inform the listeners.
                                         var fileInfo = { fileEntry: fileEntry, status: C.FILE_STATUS_SYNCED, action: C.SYNC_ACTION_DELETED, direction: C.SYNC_DIRECTION_REMOTE_TO_LOCAL };
@@ -476,12 +478,12 @@ function getDriveChanges(successCallback, errorCallback) {
                                         }
 
                                         // Remove the file id from the cache.
-                                        idm.removeDriveIdFromCache(fileName, null);
+                                        idm.removeDriveIdFromCache(fileIdInfo.fileName, null);
                                     };
-                                    deleteFile(fileName, onDeleteFileSuccess);
+                                    deleteFile(fileIdInfo, onDeleteFileSuccess);
                                 }
                             };
-                            idm.getFileNameForFileId(change.fileId, onGetFileNameForFileIdSuccess);
+                            idm.getFileIdInfoForFileId(change.fileId, onGetFileNameForFileIdSuccess);
                         } else {
                             var changedFile = change.file;
                             var numParents = changedFile.parents.length;
@@ -526,15 +528,15 @@ function getDriveChanges(successCallback, errorCallback) {
 }
 
 // This function deletes a file locally.
-function deleteFile(fileName, callback) {
+function deleteFile(fileIdInfo, callback) {
     deleteFilePromise = function(callback) {
         var onGetFileSuccess = function(fileEntry) {
             var onRemoveSuccess = function() {
-                console.log('Successfully removed file ' + fileName + '.');
+                console.log('Successfully removed file ' + fileIdinfo.fileName + '.');
                 callback(fileEntry);
             };
             var onRemoveError = function(e) {
-                console.log('Failed to remove file ' + fileName + '.');
+                console.log('Failed to remove file ' + fileIdinfo.fileName + '.');
             };
             fileEntry.remove(onRemoveSuccess, onRemoveError);
         };
@@ -543,8 +545,8 @@ function deleteFile(fileName, callback) {
         };
 
         var getFileFlags = { create: true, exclusive: false };
-        localDirectoryEntry.getFile(fileName, getFileFlags, onGetFileSuccess, onGetFileError);
-        //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+        localDirectoryEntry.getFile(fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
+        //DirectoryEntry.prototype.getFile.call(localDirectoryEntry, fileIdinfo.fileName, getFileFlags, onGetFileSuccess, onGetFileError);
     }
     if (!callback) {
         return new Promise(deleteFilePromise);
