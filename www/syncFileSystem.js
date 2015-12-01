@@ -659,10 +659,12 @@ function watchNetwork(detail) {
         getDriveChanges();
         // I think we want to call sync on any getFileId's that are in 'pending'. need to get the FileEntry
         chrome.storage.internal.get(
-            function(keys) {
-                console.log(keys);
+            function(db) {
+                console.log(db);
+
+                var keys = Object.keys(db);
                 var filtered = keys.filter(function(value) {
-                    return value.syncStatus == 'pending';
+                    return db[value].syncStatus == 'pending';
                 });
                 console.log(filtered);
             }
