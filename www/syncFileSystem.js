@@ -24,6 +24,9 @@ var conflictResolutionPolicy;
 // This timer triggers the poll for changes on Drive
 var pollTimer = null;
 
+// Last network state to decide if we are transitioning back online
+var lastNetworkState = '';
+
 //-------------
 // Local cache
 //-------------
@@ -512,7 +515,8 @@ function getDriveChanges(successCallback, errorCallback) {
                             }
                         }
                     }
-                    successCallback(numRelevantChanges);
+                    if (typeof successCallback === 'function')
+                        successCallback(numRelevantChanges);
                 },
                 errorCallback
             );
@@ -521,7 +525,8 @@ function getDriveChanges(successCallback, errorCallback) {
     ).catch(
         function(e) {
             console.log(e.stack);
-            errorCallback(e); 
+            if (typeof errorCallback === 'function')
+                errorCallback(e); 
         }
     );
 }
@@ -648,6 +653,24 @@ function saveData(fileName, data, callback) {
 
 }
 
+function watchNetwork(detail) {
+    if (lastNetworkState == 'temporary_unavailable' && detail.state = 'running') {
+        console.log("Network back online; reset getDriveChanges timer");
+        getDriveChanges();
+        // I think we want to call sync on any getFileId's that are in 'pending'. need to get the FileEntry
+        chrome.storage.internal.get(
+            function(keys) {
+                console.log(keys);
+                var filtered = keys.filter(function(value) {
+                    return value.syncStatus == 'pending';
+                });
+                console.log(filtered);
+            }
+        )
+    }
+    lastNetworkState = detail.state;
+}
+
 //=======================
 // chrome.syncFileSystem
 //=======================
@@ -706,6 +729,8 @@ exports.requestFileSystem = function(callback) {
                 pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
             };
             pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
+
+            exports.onServiceStatusChanged.addListener(exports.getServiceStatus(watchNetwork));
 
             // Pass on the file system!
             if (typeof callback === 'function') {
