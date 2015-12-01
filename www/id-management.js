@@ -34,22 +34,24 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
         }
 
         xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query)
-        .then(function(json) {
-            console.log('Successfully searched for file using query: ' + query + '.');
-            var items = json.items;
-            if (items.length === 0) {
-                console.log('  File not found.');
-                successCallback(null);
-                // errorCallback(C.FILE_NOT_FOUND_ERROR);
-            } else if (items.length == 1) {
-                console.log('  File found with id: ' + items[0].id + '.');
-                successCallback(items[0]);
-            } else {
-                console.log('  Multiple (' + items.length + ') copies found.');
-                errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
-            }
-        })
-        .catch(function(e) {
+        .then(
+            function(json) {
+                console.log('Successfully searched for file using query: ' + query + '.');
+                var items = json.items;
+                if (items.length === 0) {
+                    console.log('  File not found.');
+                    successCallback(null);
+                    // errorCallback(C.FILE_NOT_FOUND_ERROR);
+                } else if (items.length == 1) {
+                    console.log('  File found with id: ' + items[0].id + '.');
+                    successCallback(items[0]);
+                } else {
+                    console.log('  Multiple (' + items.length + ') copies found.');
+                    errorCallback(C.MULTIPLE_FILES_FOUND_ERROR);
+                }
+            },
+            errorCallback
+        ).catch(function(e) {
             console.log(e.stack);
             errorCallback(e); 
         });

@@ -863,7 +863,7 @@ exports.getServiceStatus = function(callback) {
 
 exports.onServiceStatusChanged = { };
 exports.onServiceStatusChanged.addListener = function(listener) {
-    if (typeof(listener) == 'function') {
+    if (typeof listener === 'function') {
         extendedListener = function(callback) {
             exports.getServiceStatus(listener);
         };
@@ -876,10 +876,10 @@ exports.onServiceStatusChanged.addListener = function(listener) {
 
 exports.onFileStatusChanged = { };
 exports.onFileStatusChanged.addListener = function(listener) {
-    if (typeof(listener) == 'function') {
+    if (typeof listener === 'function') {
         fileStatusListeners.push(listener);
     } else {
-        console.log('onFileStatusChanged: Attempted to add a non-function listener.');
+        console.log('onFileStatusChanged: Attempted to add a non-function listener: ' + listener);
     }
 };
 
