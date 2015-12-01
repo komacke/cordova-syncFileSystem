@@ -675,6 +675,100 @@ function watchNetwork(detail) {
 // chrome.syncFileSystem
 //=======================
 
+exports.requestFileSystem = function(callback) {
+    var manifest = chrome.runtime.getManifest();
+    if (!manifest) {
+        throw new Error("Manifest does not exist and was not set.");
+    }
+    // Numerical constants.
+    var INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = 2000;
+    var MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = 64000;
+
+    if (manifest.incoming_sync_delay && manifest.incoming_sync_delay.initial && manifest.incoming_sync_delay.maximum) {
+        INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.initial;
+        MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.maximum;
+    } else {
+        console.log("Initial and maximum incoming sync delay not specified in manifest; using defaults.");
+    }
+    var onRequestFileSystemSuccess = function(entry) {
+        var fileSystem = entry.filesystem;
+        
+        // Set the default conflict resolution policy.
+        conflictResolutionPolicy = C.CONFLICT_RESOLUTION_POLICY_LAST_WRITE_WIN;
+
+        // Create or get the subdirectory for this app.
+        var getDirectoryFlags = { create: true, exclusive: false };
+        var onCreateAppDirectoryOnDriveSuccess = function(directoryEntry) {
+            // Set the root of the file system to the app subdirectory.
+            fileSystem.root = directoryEntry;
+
+            // Set up regular remote-to-local checks.
+            var remoteToLocalSyncDelay = INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
+            var onGetDriveChangesError = function() {
+                // Use the same timeout.
+                pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
+            };
+            var onGetDriveChangesSuccess = function(numChanges) {
+                console.log('Relevant changes: ' + numChanges + '.');
+                if (numChanges === 0) {
+                    if (remoteToLocalSyncDelay < MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
+                        if (remoteToLocalSyncDelay * 2 <= MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
+                          remoteToLocalSyncDelay *= 2;
+                          console.log('  Remote-to-local sync delay doubled.');
+                        } else {
+                          remoteToLocalSyncDelay = MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY;
+                          console.log('  Remote-to-local sync increased to and capped at ' + remoteToLocalSyncDelay + 'ms.');
+                        }
+                    } else {
+                        console.log('  Remote-to-local sync delay capped at ' + remoteToLocalSyncDelay + 'ms.');
+                    }
+                } else {
+                    remoteToLocalSyncDelay = INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
+                    console.log('  Remote-to-local sync delay reset.');
+                }
+                pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
+            };
+            pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
+
+            exports.onServiceStatusChanged.addListener(exports.getServiceStatus(watchNetwork));
+
+            // Pass on the file system!
+            if (typeof callback === 'function') {
+                callback(fileSystem);
+            }
+        };
+        var onGetDirectorySuccess = function(directoryEntry) {
+            localDirectoryEntry = directoryEntry;
+            // We have to make some changes to this directory entry to enable syncability.
+            // If a file is ever retrieved or created in this directory entry, we want to enable its syncability before passing it to a callback.
+            enableSyncabilityForDirectoryEntry(directoryEntry);
+            createAppDirectoryOnDrive(directoryEntry, onCreateAppDirectoryOnDriveSuccess, callback);
+        };
+        var onGetDirectoryFailure = function(e) {
+            console.log('Failed to get directory.');
+            chrome.runtime.lastError = { message: "Sync: Failed to get local filesystem for app" };
+            if (typeof callback === 'function') {
+                callback();
+            }
+        };
+
+        // TODO(maxw): Make the directory name app-specific.
+        fileSystem.root.getDirectory(chrome.runtime.id, getDirectoryFlags, onGetDirectorySuccess, onGetDirectoryFailure);
+    };
+    var onRequestFileSystemFailure = function(e) {
+        console.log("Failed to get file system.");
+        chrome.runtime.lastError = { message: "Sync: Failed to get local filesystem" };
+        if (typeof callback === 'function') {
+            callback();
+        }
+    };
+
+    // Request the file system.
+    exec(function(url) {
+      window.resolveLocalFileSystemURL(url, onRequestFileSystemSuccess, onRequestFileSystemFailure);
+    }, onRequestFileSystemFailure, "SyncFileSystem", "getRootURL", []);
+};
+
 exports.setConflictResolutionPolicy = function(policy, callback) {
     conflictResolutionPolicy = policy;
     if (callback) {
@@ -788,100 +882,6 @@ exports.onFileStatusChanged.addListener = function(listener) {
     } else {
         console.log('onFileStatusChanged: Attempted to add a non-function listener: ' + listener);
     }
-};
-
-exports.requestFileSystem = function(callback) {
-    var manifest = chrome.runtime.getManifest();
-    if (!manifest) {
-        throw new Error("Manifest does not exist and was not set.");
-    }
-    // Numerical constants.
-    var INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = 2000;
-    var MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = 64000;
-
-    if (manifest.incoming_sync_delay && manifest.incoming_sync_delay.initial && manifest.incoming_sync_delay.maximum) {
-        INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.initial;
-        MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.maximum;
-    } else {
-        console.log("Initial and maximum incoming sync delay not specified in manifest; using defaults.");
-    }
-    var onRequestFileSystemSuccess = function(entry) {
-        var fileSystem = entry.filesystem;
-        
-        // Set the default conflict resolution policy.
-        conflictResolutionPolicy = C.CONFLICT_RESOLUTION_POLICY_LAST_WRITE_WIN;
-
-        // Create or get the subdirectory for this app.
-        var getDirectoryFlags = { create: true, exclusive: false };
-        var onCreateAppDirectoryOnDriveSuccess = function(directoryEntry) {
-            // Set the root of the file system to the app subdirectory.
-            fileSystem.root = directoryEntry;
-
-            // Set up regular remote-to-local checks.
-            var remoteToLocalSyncDelay = INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
-            var onGetDriveChangesError = function() {
-                // Use the same timeout.
-                pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
-            };
-            var onGetDriveChangesSuccess = function(numChanges) {
-                console.log('Relevant changes: ' + numChanges + '.');
-                if (numChanges === 0) {
-                    if (remoteToLocalSyncDelay < MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
-                        if (remoteToLocalSyncDelay * 2 <= MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
-                          remoteToLocalSyncDelay *= 2;
-                          console.log('  Remote-to-local sync delay doubled.');
-                        } else {
-                          remoteToLocalSyncDelay = MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY;
-                          console.log('  Remote-to-local sync increased to and capped at ' + remoteToLocalSyncDelay + 'ms.');
-                        }
-                    } else {
-                        console.log('  Remote-to-local sync delay capped at ' + remoteToLocalSyncDelay + 'ms.');
-                    }
-                } else {
-                    remoteToLocalSyncDelay = INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
-                    console.log('  Remote-to-local sync delay reset.');
-                }
-                pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
-            };
-            pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
-
-            exports.onServiceStatusChanged.addListener(exports.getServiceStatus(watchNetwork));
-
-            // Pass on the file system!
-            if (typeof callback === 'function') {
-                callback(fileSystem);
-            }
-        };
-        var onGetDirectorySuccess = function(directoryEntry) {
-            localDirectoryEntry = directoryEntry;
-            // We have to make some changes to this directory entry to enable syncability.
-            // If a file is ever retrieved or created in this directory entry, we want to enable its syncability before passing it to a callback.
-            enableSyncabilityForDirectoryEntry(directoryEntry);
-            createAppDirectoryOnDrive(directoryEntry, onCreateAppDirectoryOnDriveSuccess, callback);
-        };
-        var onGetDirectoryFailure = function(e) {
-            console.log('Failed to get directory.');
-            chrome.runtime.lastError = { message: "Sync: Failed to get local filesystem for app" };
-            if (typeof callback === 'function') {
-                callback();
-            }
-        };
-
-        // TODO(maxw): Make the directory name app-specific.
-        fileSystem.root.getDirectory(chrome.runtime.id, getDirectoryFlags, onGetDirectorySuccess, onGetDirectoryFailure);
-    };
-    var onRequestFileSystemFailure = function(e) {
-        console.log("Failed to get file system.");
-        chrome.runtime.lastError = { message: "Sync: Failed to get local filesystem" };
-        if (typeof callback === 'function') {
-            callback();
-        }
-    };
-
-    // Request the file system.
-    exec(function(url) {
-      window.resolveLocalFileSystemURL(url, onRequestFileSystemSuccess, onRequestFileSystemFailure);
-    }, onRequestFileSystemFailure, "SyncFileSystem", "getRootURL", []);
 };
 
 exports.resetSyncFileSystem = function (callback) {
