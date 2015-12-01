@@ -732,7 +732,7 @@ exports.requestFileSystem = function(callback) {
             };
             pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
 
-            exports.onServiceStatusChanged.addListener(exports.getServiceStatus.bind(watchNetwork));
+            exports.onServiceStatusChanged.addListener(exports.getServiceStatus.bind(null, watchNetwork));
 
             // Pass on the file system!
             if (typeof callback === 'function') {
