@@ -870,7 +870,8 @@ exports.onServiceStatusChanged.addListener = function(listener) {
         document.addEventListener('offline', extendedListener, false);
         document.addEventListener('online', extendedListener, false);
     } else {
-        console.log('onServiceStatusChanged: Attempted to add a non-function listener.');
+        console.log('onServiceStatusChanged: Attempted to add a non-function listener: ' + listener);
+        console.log(listener);
     }
 };
 
