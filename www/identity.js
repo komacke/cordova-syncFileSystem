@@ -9,7 +9,7 @@ exports.tokenString = '';
 exports.getTokenString = function() {
     return new Promise(function(resolve, reject) {
         // Get the auth token.
-        chrome.identity.getAuthToken({ interactive: true }, 
+        chrome.identity.getAuthToken({ interactive: false }, 
             function(token) {
                 if (token) {
                     exports.tokenString = token;
