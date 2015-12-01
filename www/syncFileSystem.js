@@ -654,7 +654,7 @@ function saveData(fileName, data, callback) {
 }
 
 function watchNetwork(detail) {
-    if (lastNetworkState == 'temporary_unavailable' && detail.state = 'running') {
+    if (lastNetworkState == 'temporary_unavailable' && detail.state == 'running') {
         console.log("Network back online; reset getDriveChanges timer");
         getDriveChanges();
         // I think we want to call sync on any getFileId's that are in 'pending'. need to get the FileEntry
