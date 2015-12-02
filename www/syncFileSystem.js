@@ -456,6 +456,7 @@ function getDriveChanges(successCallback, errorCallback) {
                         if (typeof successCallback === 'function')
                             successCallback(null);
                             //successCallback(numRelevantChanges);
+                            return;
                     }
                     var numChanges = responseJson.items.length;
                     console.log('Successfully retrieved ' + numChanges + ' changes.');
@@ -687,13 +688,10 @@ exports.requestFileSystem = function(callback) {
     if (!manifest) {
         throw new Error("Manifest does not exist and was not set.");
     }
-    // Numerical constants.
-    var INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = 2000;
-    var MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = 64000;
 
     if (manifest.incoming_sync_delay && manifest.incoming_sync_delay.initial && manifest.incoming_sync_delay.maximum) {
-        INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.initial;
-        MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.maximum;
+        C.INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.initial;
+        C.MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY = manifest.incoming_sync_delay.maximum;
     } else {
         console.log("Initial and maximum incoming sync delay not specified in manifest; using defaults.");
     }
@@ -710,7 +708,7 @@ exports.requestFileSystem = function(callback) {
             fileSystem.root = directoryEntry;
 
             // Set up regular remote-to-local checks.
-            var remoteToLocalSyncDelay = INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
+            var remoteToLocalSyncDelay = C.INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
             var onGetDriveChangesError = function() {
                 // Use the same timeout.
                 pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
@@ -718,19 +716,22 @@ exports.requestFileSystem = function(callback) {
             var onGetDriveChangesSuccess = function(numChanges) {
                 console.log('Relevant changes: ' + numChanges + '.');
                 if (numChanges === 0) {
-                    if (remoteToLocalSyncDelay < MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
+                    if (remoteToLocalSyncDelay < C.MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
                         if (remoteToLocalSyncDelay * 2 <= MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
                           remoteToLocalSyncDelay *= 2;
                           console.log('  Remote-to-local sync delay doubled.');
                         } else {
-                          remoteToLocalSyncDelay = MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY;
+                          remoteToLocalSyncDelay = C.MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY;
                           console.log('  Remote-to-local sync increased to and capped at ' + remoteToLocalSyncDelay + 'ms.');
                         }
                     } else {
                         console.log('  Remote-to-local sync delay capped at ' + remoteToLocalSyncDelay + 'ms.');
                     }
+                } else if (!numChanges) {
+                    remoteToLocalSyncDelay = C.INITIAL_REMOTE_TO_LOCAL_SYNC_OFFLINE_DELAY;
+                    console.log('  Remote-to-local sync delay set for offline.');
                 } else {
-                    remoteToLocalSyncDelay = INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
+                    remoteToLocalSyncDelay = C.INITIAL_REMOTE_TO_LOCAL_SYNC_DELAY;
                     console.log('  Remote-to-local sync delay reset.');
                 }
                 pollTimer = window.setTimeout(getDriveChanges, remoteToLocalSyncDelay, onGetDriveChangesSuccess, onGetDriveChangesError);
