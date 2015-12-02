@@ -51,7 +51,7 @@ exports.request = function(method, url, contentType, data) {
                             }
                         } else if (xhr.status === 0) {
                             console.log('Failed with status ' + xhr.status + '.');
-                            console.log(e);
+                            console.log(xhr);
                             successCallback(null);
                         } else {
                             console.log('Failed with status ' + xhr.status + '.');

@@ -452,6 +452,11 @@ function getDriveChanges(successCallback, errorCallback) {
                 + '&includeDeleted=true&includeSubscribed=true&maxResults=1000')
             .then(
                 function(responseJson) {
+                    if (!responseJson) {
+                        if (typeof successCallback === 'function')
+                            successCallback(null);
+                            //successCallback(numRelevantChanges);
+                    }
                     var numChanges = responseJson.items.length;
                     console.log('Successfully retrieved ' + numChanges + ' changes.');
 
