@@ -49,6 +49,10 @@ exports.request = function(method, url, contentType, data) {
                                     successCallback(xhr.responseText);
                                     break;      
                             }
+                        } else if (xhr.status === 0) {
+                            console.log('Failed with status ' + xhr.status + '.');
+                            console.log(e);
+                            successCallback(null);
                         } else {
                             console.log('Failed with status ' + xhr.status + '.');
                             if (errorCallback) 
@@ -66,7 +70,7 @@ exports.request = function(method, url, contentType, data) {
         );}
     ).catch(
         function(e) {
-            console.log(e.stack);
+            console.log(e);
             errorCallback(e); 
         }
     );

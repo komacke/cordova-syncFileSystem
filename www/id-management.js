@@ -36,6 +36,10 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
         xhr.getJSON('https://www.googleapis.com/drive/v2/files?q=' + query)
         .then(
             function(json) {
+                if (!json) {
+                    console.log('No network response.');
+                    successCallback(null);
+                }
                 console.log('Successfully searched for file using query: ' + query + '.');
                 var items = json.items;
                 if (items.length === 0) {
