@@ -87,7 +87,7 @@ exports.getDirectoryId = function(directoryName, parentDirectoryId, shouldCreate
                     var onCacheDriveIdSuccess = function() {
                         successCallback(driveIdInfo.id);
                     };
-                    exports.cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_NA, onCacheDriveIdSuccess);
+                    exports.cacheDriveId(directoryName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
                 }
             };
 

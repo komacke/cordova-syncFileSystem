@@ -9,7 +9,6 @@ exports.SYNC_ACTION_UPDATED = 'updated';
 exports.FILE_STATUS_CONFLICTING = 'conflicting';
 exports.FILE_STATUS_PENDING = 'pending';
 exports.FILE_STATUS_SYNCED = 'synced';
-exports.FILE_STATUS_NA = null;
 
 exports.SYNC_DIRECTION_LOCAL_TO_REMOTE = 'local_to_remote';
 exports.SYNC_DIRECTION_REMOTE_TO_LOCAL = 'remote_to_local';
