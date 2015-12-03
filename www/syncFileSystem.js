@@ -720,7 +720,7 @@ exports.requestFileSystem = function(callback) {
                 console.log('Relevant changes: ' + numChanges + '.');
                 if (numChanges === 0) {
                     if (remoteToLocalSyncDelay < C.MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
-                        if (remoteToLocalSyncDelay * 2 <= MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
+                        if (remoteToLocalSyncDelay * 2 <= C.MAXIMUM_REMOTE_TO_LOCAL_SYNC_DELAY) {
                           remoteToLocalSyncDelay *= 2;
                           console.log('  Remote-to-local sync delay doubled.');
                         } else {
