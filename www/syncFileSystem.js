@@ -678,8 +678,8 @@ function watchNetwork(detail) {
                 console.log(filtered);
 
                 var getFileFlags = { create: false, exclusive: false };
-                for (var=i; i<filtered.length; i++) {
-                    localDirectoryEntry.getFile(filtered[i].fileName, getFileFlags, function(fileEntry){
+                for (var i=0; i<filtered.length; i++) {
+                    localDirectoryEntry.getFile(filtered[i].fileName, getFileFlags, function(fileEntry) {
                         sync(fileEntry);
                     });
                 }
