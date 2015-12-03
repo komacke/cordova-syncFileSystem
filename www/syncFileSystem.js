@@ -233,7 +233,7 @@ function sync(entry, callback) {
 
     // Augment the callback to fire the status listener, but only if we've synced a file, not a directory.
     var augmentedCallback = function(fileAction) {
-        if (entry.isFile) {
+        if (fileAction && entry.isFile) {
             var fileInfo = { fileEntry: entry, status: C.FILE_STATUS_SYNCED, action: fileAction, direction: C.SYNC_DIRECTION_LOCAL_TO_REMOTE };
             for (var i = 0; i < fileStatusListeners.length; i++) {
                 fileStatusListeners[i](fileInfo);
@@ -343,7 +343,10 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                             bodyString
                         ).then(
                             function(fileAction) {
-                                console.log('File synced!');
+                                if(fileAction)
+                                    console.log('File synced!');
+                                else
+                                    console.log('File not synced - offline');
                                 callback(fileAction);
                             },
                             function(xhr) {

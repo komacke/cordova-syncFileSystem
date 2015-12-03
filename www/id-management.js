@@ -39,6 +39,7 @@ exports.getDriveFileId = function(query, successCallback, errorCallback) {
                 if (!json) {
                     console.log('No network response.');
                     successCallback(null);
+                    return;
                 }
                 console.log('Successfully searched for file using query: ' + query + '.');
                 var items = json.items;
@@ -138,13 +139,14 @@ exports.getFileId = function(fileName, parentDirectoryId, successCallback) {
                 query = 'title = "' + fileName + '" and "' + parentDirectoryId + '" in parents and trashed = false';
                 var augmentedSuccessCallback = function(driveIdInfo) {
                     console.log("File: " + fileName + " not found in cache.");
-                        successCallback(null);
-/*
                     var onCacheDriveIdSuccess = function() {
                         successCallback(driveIdInfo);
                     };
-                    exports.cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
- */
+                    if (!driveIdInfo) {
+                        exports.cacheDriveId(fileName, null, null, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    } else {
+                        exports.cacheDriveId(fileName, driveIdInfo.id, driveIdInfo.modifiedDate, C.FILE_STATUS_PENDING, onCacheDriveIdSuccess);
+                    }
                };
                 var errorCallback = function(e) {
                     if (e === C.FILE_NOT_FOUND_ERROR) {
