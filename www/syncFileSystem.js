@@ -676,6 +676,13 @@ function watchNetwork(detail) {
                     return db[value].syncStatus == 'pending';
                 });
                 console.log(filtered);
+
+                var getFileFlags = { create: false, exclusive: false };
+                for (var=i; i<filtered.length; i++) {
+                    localDirectoryEntry.getFile(filtered[i].fileName, getFileFlags, function(fileEntry){
+                        sync(fileEntry);
+                    });
+                }
             }
         )
     }
