@@ -325,7 +325,7 @@ function uploadFile(fileEntry, parentDirectoryId, callback) {
                         // If there's a file id, update the file.  Otherwise, upload it anew.
                         var method = '';
                         var url = '';
-                        if (fileIdInfo) {
+                        if (fileIdInfo.driveId) {
                             fileAction = C.SYNC_ACTION_UPDATED;
                             method = 'PUT';
                             url = 'https://www.googleapis.com/upload/drive/v2/files/' + fileIdInfo[driveId] + '?uploadType=multipart';
@@ -679,9 +679,13 @@ function watchNetwork(detail) {
 
                 var getFileFlags = { create: false, exclusive: false };
                 for (var i=0; i<filtered.length; i++) {
-                    localDirectoryEntry.getFile(filtered[i].fileName, getFileFlags, function(fileEntry) {
-                        sync(fileEntry);
-                    });
+                    localDirectoryEntry.getFile(db[filtered[i]].fileName, getFileFlags, 
+                        function(fileEntry) {
+                            sync(fileEntry);
+                        },
+                        function(e) {
+                            console.log(e);
+                        });
                 }
             }
         )
